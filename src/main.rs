@@ -1,5 +1,6 @@
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{App, HttpResponse, HttpServer, Responder, get};
 
+#[get("/")]
 fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
 }
@@ -7,7 +8,7 @@ fn index() -> impl Responder {
 fn main() {
     HttpServer::new(|| {
         App::new()
-            .route("/", web::get().to(index))
+            .service(index)
     })
     .bind("127.0.0.1:8088")
     .unwrap()
