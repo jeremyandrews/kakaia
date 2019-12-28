@@ -9,8 +9,9 @@ fn audio_to_text(base64_audio: String) -> impl Responder {
         Ok(audio) => audio,
         Err(e) => {
             // @TODO: logging, properly handle this error
-            eprintln!("failed to decode audio.data: {}", e);
-            return format!("failed to decode audio.data: {}", e);
+            let error = format!("failed to decode audio.data: {}", e);
+            eprintln!("{}", &error);
+            return error;
         }
     };
     // Create a temporary file.
@@ -49,7 +50,26 @@ fn audio_to_text(base64_audio: String) -> impl Responder {
         }
     };
     let desc = reader.description();
+
+    // Validate the audio file.
+    let mut errors: Vec<String> = vec![];
+    if desc.channel_count() != 1 {
+        let error = format!("audio file must have exactly 1 track, not {}", desc.channel_count());
+        eprintln!("{}", &error);
+        errors.push(error);
+    }
+    if desc.sample_rate() != 16000 {
+        let error = format!("audio sample rate must be 16,000, not {}", desc.sample_rate());
+        eprintln!("{}", &error);
+        errors.push(error);
+    }
+    if errors.len() > 0 {
+        return format!("{:?}\n", errors);
+    }
     format!("audio desc: '{:?}'", desc)
+
+    // @TODO Optionally save a copy of the audio file.
+    // @TODO Convert audio to text.
 }
 
 fn main() {
