@@ -16,8 +16,6 @@ Still a work in progress:
 Next steps:
 
 - optionally store permanent copy of validated audio file
-- invoke DeepSpeech to convert to text
-- return text version of audio file
 
 ## Notes
 
