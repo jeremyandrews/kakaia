@@ -2,6 +2,25 @@
 
 Kakaia strives to be a personal assistant, implemented primarily in Rust.
 
+## Usage
+
+Still a work in progress:
+
+1. launch server: `cargo run`
+1. POST: 
+    ```
+    $ curl --header "Content-Type: application/json" --request POST \
+           --data '{"filename": "test.wav"}' http://127.0.0.1:8088/convert/audio/text
+    processing audio file: test.wav
+    ```
+
+Next steps:
+
+- add support for passing in audio file
+- validate audio file and store
+- invoke DeepSpeech to convert to text
+- return text version of audio file
+
 ## Roadmap
 
 ### Step 1: Proof of Concept

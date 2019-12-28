@@ -654,6 +654,7 @@ name = "kakaia"
 version = "0.1.0"
 dependencies = [
  "actix-web 1.0.9 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.104 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
