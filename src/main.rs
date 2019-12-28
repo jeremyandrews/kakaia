@@ -1,5 +1,5 @@
 use actix_web::{HttpServer, App, Responder, web, FromRequest};
-use tempfile::tempfile;
+use tempfile::NamedTempFile;
 use std::io::Write;
 use audrey::read::Reader;
 
@@ -14,31 +14,42 @@ fn audio_to_text(base64_audio: String) -> impl Responder {
         }
     };
     // Create a temporary file.
-    let temporary_file = match tempfile() {
+    let mut temporary_file = match NamedTempFile::new() {
         Ok(f) => f,
         Err(e) => {
             return format!("failed to create temporary file: {}", e);
         }
     };
-    // Write audio.bytes into temporary file.
-    match writeln!(&temporary_file, "{:?}", &audio_bytes) {
-        Ok(_) => (),
+    // Grab a pointer to the beginning of the file.
+    let audio_file = match temporary_file.reopen() {
+        Ok(a) => a,
         Err(e) => {
-            eprintln!("failed to write to temporary file: {}", e);
-            return format!("failed to write to temporary file: {}", e);
+            return format!("failed to open temporary file: {}", e);
         }
+    };
+
+    // Write audio.bytes into temporary file.
+    let mut pos = 0;
+    while pos < audio_bytes.len() {
+        let bytes_written = match temporary_file.write(&audio_bytes[pos..]) {
+            Ok(b) => b,
+            Err(e) => {
+                return format!("failed to create temporary file: {}", e);
+            }
+        };
+        pos += bytes_written;
     }
+
     // Load audio from temporary file.
-	let reader = match Reader::new(&temporary_file) {
+    let reader = match Reader::new(audio_file) {
         Ok(r) => r,
         Err(e) => {
             eprintln!("failed to load audio from temporary file: {}", e);
             return format!("failed to load audio from temporary file: {}", e);
         }
     };
-	let desc = reader.description();
-
-    format!("audio bytes: '{:?}' desc: '{:?}'", audio_bytes, desc)
+    let desc = reader.description();
+    format!("audio desc: '{:?}'", desc)
 }
 
 fn main() {

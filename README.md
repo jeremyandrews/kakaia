@@ -9,9 +9,8 @@ Still a work in progress:
 1. launch server: `cargo run`
 1. POST: 
     ```
-    curl --header "Content-Type: application/json" --request POST \
-         --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
-    failed to load audio from temporary file: Failed to read enough bytes.
+    curl --request POST --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
+    audio desc: 'Description { format: Wav, channel_count: 1, sample_rate: 16000 }'
     ```
 
 (For now we're passing in the base64 encoded string "hello world".)
