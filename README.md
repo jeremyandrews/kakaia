@@ -10,9 +10,8 @@ Still a work in progress:
 1. POST: 
     ```
     curl --header "Content-Type: application/json" --request POST \
-         --data '{"filename": "test.wav", "data": "aGVsbG8gd29ybGQ="}' \
-         http://127.0.0.1:8088/convert/audio/text
-    audio file: 'test.wav', bytes: '[104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]'
+         --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
+    failed to load audio from temporary file: Failed to read enough bytes.
     ```
 
 (For now we're passing in the base64 encoded string "hello world".)
