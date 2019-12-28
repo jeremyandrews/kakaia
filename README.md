@@ -9,14 +9,16 @@ Still a work in progress:
 1. launch server: `cargo run`
 1. POST: 
     ```
-    $ curl --header "Content-Type: application/json" --request POST \
-           --data '{"filename": "test.wav"}' http://127.0.0.1:8088/convert/audio/text
-    processing audio file: test.wav
+    curl --header "Content-Type: application/json" --request POST \
+         --data '{"filename": "test.wav", "data": "aGVsbG8gd29ybGQ="}' \
+         http://127.0.0.1:8088/convert/audio/text
+    audio file: 'test.wav', bytes: '[104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100]'
     ```
+
+(For now we're passing in the base64 encoded string "hello world".)
 
 Next steps:
 
-- add support for passing in audio file
 - validate audio file and store
 - invoke DeepSpeech to convert to text
 - return text version of audio file
