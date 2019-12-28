@@ -23,6 +23,15 @@ Next steps:
 - invoke DeepSpeech to convert to text
 - return text version of audio file
 
+## Notes
+
+Uses (audrey)[https://github.com/RustAudio/audrey] to support the following audio file types:
+
+- FLAC (`.flac`)
+- Ogg Vorbis (`.ogg`)
+- WAV (`.wav`)
+- ALAC within CAF (`.caf`)
+
 ## Roadmap
 
 ### Step 1: Proof of Concept
