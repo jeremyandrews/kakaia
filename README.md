@@ -10,7 +10,7 @@ Still a work in progress:
 1. POST: 
     ```
     curl --request POST --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
-    audio desc: 'Description { format: Wav, channel_count: 1, sample_rate: 16000 }'
+    audio to text: test
     ```
 
 Next steps:
