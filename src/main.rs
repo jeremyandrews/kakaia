@@ -4,6 +4,7 @@ use std::path::Path;
 use audrey::read::Reader;
 use audrey::sample::interpolate::{Converter, Linear};
 use audrey::sample::signal::{from_iter, Signal};
+use chrono::{DateTime, Utc};
 use deepspeech::Model;
 use tempfile::NamedTempFile;
 use actix_web::{HttpServer, App, Responder, web, FromRequest};
@@ -71,10 +72,7 @@ fn audio_to_text(base64_audio: String) -> impl Responder {
     if errors.len() > 0 {
         return format!("{:?}\n", errors);
     }
-    format!("audio desc: '{:?}'", desc);
 
-    // @TODO Optionally save a copy of the audio file.
-    // @TODO Convert audio to text. 
     // These constants are taken from the C++ sources of the client.
     const BEAM_WIDTH :u16 = 500;
     const LM_WEIGHT :f32 = 0.75;
@@ -108,7 +106,58 @@ fn audio_to_text(base64_audio: String) -> impl Responder {
     };
 
     // Run the speech to text algorithm
-    format!("audio to text: {}\n", m.speech_to_text(&audio_buf).unwrap())
+    // @TODO handle errors
+    let message = m.speech_to_text(&audio_buf).unwrap();
+
+    // @TODO make saving a copy of the audio file optional
+    let now: DateTime<Utc> = Utc::now();
+    let archive_directory = format!("archive/{}/{}/{}/", now.format("%Y"), now.format("%m"), now.format("%d"));
+    match std::fs::create_dir_all(&archive_directory) {
+        Ok(_) =>  {
+            let hour = now.format("%H");
+            let minute = now.format("%M");
+            let second = now.format("%S");
+            let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.wav", archive_directory, &hour, &minute, &second)) {
+                Ok(b) => b,
+                Err(e) => {
+                    // @TODO: deal with this gracefully
+                    eprintln!("failed to create archive copy of audio file: {}", e);
+                    return "error archiving audio file".to_string();
+                }
+            };
+            // Write audio.bytes into temporary file.
+            let mut pos = 0;
+            while pos < audio_bytes.len() {
+                let bytes_written = match buffer.write(&audio_bytes[pos..]) {
+                    Ok(b) => b,
+                    Err(e) => {
+                        return format!("failed to write archive file: {}", e);
+                    }
+                };
+                pos += bytes_written;
+            }
+            let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.txt", archive_directory, &hour, &minute, &second)) {
+                Ok(b) => b,
+                Err(e) => {
+                    // @TODO: deal with this gracefully
+                    eprintln!("failed to create archive text conversion of audio file: {}", e);
+                    return "error archiving text conversion of audio file".to_string();
+                }
+            };
+            match writeln!(buffer, "{}", &message) {
+                Ok(_) => (),
+                Err(e) => eprintln!("failed to archive text conversion of audio file: {}", e),
+            }
+        }
+        Err(e) => {
+            eprintln!("failed to create directory: '{}', {}", &archive_directory, e);
+        }
+    }
+
+    // Debug output for now:
+    println!("{}", &message);
+    // Return text
+    format!("{}\n", message)
 }
 
 fn main() {
@@ -123,7 +172,7 @@ fn main() {
                 .route(web::post().to(audio_to_text)),
             )
     })
-    .bind("127.0.0.1:8088")
+    .bind("0.0.0.0:8088")
     .unwrap()
     .run()
     .unwrap();
