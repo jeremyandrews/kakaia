@@ -36,8 +36,10 @@ Or, to listen on a different port, you could pass in the following:
 
 You can use `curl` to test the Kakaia engine without a client as follows:
 
-    curl --request POST --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
-    test
+```
+curl --request POST --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
+test
+```
 
 ### Kakaia client
 
