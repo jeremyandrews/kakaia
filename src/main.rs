@@ -1,13 +1,30 @@
 use std::io::Write;
 use std::path::Path;
 
+use actix_web::{HttpServer, App, Responder, web, FromRequest};
 use audrey::read::Reader;
 use audrey::sample::interpolate::{Converter, Linear};
 use audrey::sample::signal::{from_iter, Signal};
 use chrono::{DateTime, Utc};
 use deepspeech::Model;
+use structopt::StructOpt;
 use tempfile::NamedTempFile;
-use actix_web::{HttpServer, App, Responder, web, FromRequest};
+
+#[derive(StructOpt, Debug, Clone)]
+#[structopt(name = "kakaia")]
+struct Opt {
+    /// Verbose mode (-v, -vv, -vvv, etc.)
+    #[structopt(short, long, parse(from_occurrences))]
+    verbose: u8,
+
+    /// listen on IP:port
+    #[structopt(short, long, default_value = "0.0.0.0:8088")]
+    listen: String,
+
+    /// max bytes for audio files
+    #[structopt(short, long, default_value = "4194304")]
+    bytes: usize,
+}
 
 fn audio_to_text(base64_audio: String) -> impl Responder {
     // Load audio.bytes from String
@@ -161,19 +178,21 @@ fn audio_to_text(base64_audio: String) -> impl Responder {
 }
 
 fn main() {
-    HttpServer::new(|| {
+    let opt = Opt::from_args();
+    let opt_clone = opt.clone();
+
+    let server = HttpServer::new(move || {
         App::new().service(
             web::resource("/convert/audio/text").data(
                 String::configure(|cfg| {
-                    // limit audio file size to 4MB
-                    // @TODO: expose as configuration
-                    cfg.limit(4194304)
+                    // limit audio file size in bytes (defaults to 4MB)
+                    cfg.limit(opt_clone.bytes)
                 }))
                 .route(web::post().to(audio_to_text)),
             )
-    })
-    .bind("0.0.0.0:8088")
-    .unwrap()
-    .run()
-    .unwrap();
+    });
+    server.bind(&opt.listen)
+        .unwrap()
+        .run()
+        .unwrap();
 }
