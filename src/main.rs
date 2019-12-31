@@ -73,7 +73,7 @@ fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: Str
     }
 
     // Convert audio file to text.
-    let message = speech::convert_audio_to_text(audio_file);
+    let (message, extension) = speech::convert_audio_to_text(audio_file);
 
     // Optionally store a copy of the audio and text
     if config.store {
@@ -84,8 +84,7 @@ fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: Str
                 let hour = now.format("%H");
                 let minute = now.format("%M");
                 let second = now.format("%S");
-                // @TODO: add correct file extension
-                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.wav", archive_directory, &hour, &minute, &second)) {
+                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.{}", archive_directory, &hour, &minute, &second, extension)) {
                     Ok(b) => b,
                     Err(e) => {
                         // @TODO: deal with this gracefully

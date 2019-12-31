@@ -13,12 +13,12 @@ const VALID_WORD_COUNT_WEIGHT :f32 = 1.85;
 // The model has been trained on this specific sample rate.
 const SAMPLE_RATE :u32 = 16_000;
 
-pub fn convert_audio_to_text(audio_file: std::fs::File) -> String {
+pub fn convert_audio_to_text(audio_file: std::fs::File) -> (String, String) {
     // Read audio from temporary file.
     let mut reader = match Reader::new(&audio_file) {
         Ok(r) => r,
         Err(e) => {
-            return format!("failed to load audio file ({:?}): {}", audio_file, e);
+            return (format!("failed to load audio file ({:?}): {}", audio_file, e), "unknown".to_string());
         }
     };
 
@@ -36,7 +36,7 @@ pub fn convert_audio_to_text(audio_file: std::fs::File) -> String {
         errors.push(error);
     }
     if errors.len() > 0 {
-        return format!("{:?}\n", errors);
+        return (format!("{:?}\n", errors), "unknown".to_string());
     }
     // @TODO: get this from ENV
     let model_dir_str = "/home/jandrews/devel/speech/DeepSpeech-0.6.0/models/";
@@ -65,7 +65,14 @@ pub fn convert_audio_to_text(audio_file: std::fs::File) -> String {
         conv.until_exhausted().map(|v| v[0]).collect()
     };
 
+    let extension = match desc.format() {
+        audrey::Format::Flac => "flac".to_string(),
+        audrey::Format::OggVorbis => "ogg".to_string(),
+        audrey::Format::Wav => "wav".to_string(),
+        audrey::Format::CafAlac => "caf".to_string(),
+    };
+
     // Run the speech to text algorithm
     // @TODO handle errors
-    m.speech_to_text(&audio_buf).unwrap()
+    (m.speech_to_text(&audio_buf).unwrap(), extension)
 }
