@@ -4,7 +4,7 @@ Kakaia strives to be a personal assistant supporting voice commands without send
 
 ## Usage
 
-First, one time you must set up your environment as follows:
+Build Kakaia as follows:
 
 1. Download the appropriate native_client from https://github.com/mozilla/DeepSpeech/releases/tag/v0.6.0 and extract locally
 1. export LD_LIBRARY_PATH and LIBRARY_PATH both pointing to the files extracted in the previous step. For example:
@@ -13,7 +13,7 @@ First, one time you must set up your environment as follows:
     export LIBRARY_PATH=~/devel/speech/deepspeech-rs/native_client/
     ```
 1. Download the [0.6.0 models](https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-models.tar.gz) from https://github.com/mozilla/DeepSpeech/releases/tag/v0.6.0 and extract locally
-1. @TODO: currently the model location is hard-coded to: /home/jandrews/devel/speech/DeepSpeech-0.6.0/models/ -- obviously this has to be made configurable
+1. @TODO: _currently the model location is hard-coded to: /home/jandrews/devel/speech/DeepSpeech-0.6.0/models/ -- obviously this has to be made configurable_
 1. Build the Kakaia engine: `cargo build --release`
 1. Run the Kakaia engine, see available configuration as follows: `./targets/release/kakaia -h`
 
@@ -33,14 +33,16 @@ The client provides a simplistic interface to record audio on the watch, which i
 
 ### Notes
 
-The Kakaia engine depends on [audrey](https://github.com/RustAudio/audrey) to support the following audio file types:
+The Kakaia engine is written in Rust, using the [Rust bindings for the deepspeech library](https://github.com/RustAudio/deepspeech-rs) for speech-to-text conversions, and [Actix](https://actix.rs/) for the API.
+
+The model included with DeepSpeech 0.6.0 was mostly trained with American English data and does not work will with other accents. https://hacks.mozilla.org/2019/12/deepspeech-0-6-mozillas-speech-to-text-engine/
+
+Deepspeech-rs currently requires that audio be recorded with a single mono-track, at 16,000 Hz. It uses [audrey](https://github.com/RustAudio/audrey) to support the following audio file types:
 
 - FLAC (`.flac`)
 - Ogg Vorbis (`.ogg`)
 - WAV (`.wav`)
 - ALAC within CAF (`.caf`)
-
-Deepspeech currently requires that audio be recorded with a single mono-track, at 16,000 Hz.
 
 ## Roadmap
 
