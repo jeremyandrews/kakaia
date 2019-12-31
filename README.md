@@ -73,12 +73,12 @@ Deepspeech-rs currently requires that audio be recorded with a single mono-track
 
 The Proof of Concept is functional, but IPs etc are hard-coded to my environment. The PoC is a success when it can be configured and run by multiple people without requiring code-level changes.
 
-Kakaia enginge:
+Kakaia engine:
 
 - accept encoded audio files through API endpoint (done)
 - invoke DeepSpeech to convert the audio file to text (done)
 - return text version via API (done)
-- add configuration (currently it's hard-coded to my environment)
+- configurable (done)
 
 Kakaia watchOS app:
 
