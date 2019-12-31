@@ -7,15 +7,20 @@ Kakaia strives to be a personal assistant supporting voice commands without send
 Build Kakaia as follows:
 
 1. Download the appropriate native_client from https://github.com/mozilla/DeepSpeech/releases/tag/v0.6.0 and extract locally
-1. export LD_LIBRARY_PATH and LIBRARY_PATH both pointing to the files extracted in the previous step. For example:
+1. export `LD_LIBRARY_PATH` and `LIBRARY_PATH` both pointing to the files extracted in the previous step. For example:
 
     ```
-    export LD_LIBRARY_PATH=~/devel/speech/deepspeech-rs/native_client/
-    export LIBRARY_PATH=~/devel/speech/deepspeech-rs/native_client/
+    export LD_LIBRARY_PATH=/opt/deepspeech-rs/native_client/
+    export LIBRARY_PATH=/opt/deepspeech-rs/native_client/
     ```
 
 1. Download the [0.6.0 models](https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-models.tar.gz) from https://github.com/mozilla/DeepSpeech/releases/tag/v0.6.0 and extract locally
-1. @TODO: _currently the model location is hard-coded to: /home/jandrews/devel/speech/DeepSpeech-0.6.0/models/ -- obviously this has to be made configurable_
+1. export `DEEPSPEECH_MODELS` pointing to the files extracted in the previous step. (By default it will look for `models/` in the current working directory.) For example:
+
+    ```
+    export DEEPSPEECH_MODELS=/opt/models/
+    ```
+
 1. Build the Kakaia engine: `cargo build --release`
 
 Run the Kakaia engine using all defaults as follows:

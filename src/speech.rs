@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::env;
 
 use audrey::read::Reader;
 use audrey::sample::interpolate::{Converter, Linear};
@@ -38,18 +39,26 @@ pub fn convert_audio_to_text(audio_file: std::fs::File) -> (String, String) {
     if errors.len() > 0 {
         return (format!("{:?}\n", errors), "unknown".to_string());
     }
-    // @TODO: get this from ENV
-    let model_dir_str = "/home/jandrews/devel/speech/DeepSpeech-0.6.0/models/";
-    let dir_path = Path::new(&model_dir_str);
-    // @TODO: gracefull handle errors
-    let mut m = Model::load_from_files(
-        &dir_path.join("output_graph.pb"),
-        BEAM_WIDTH).unwrap();
-        m.enable_decoder_with_lm(
-        &dir_path.join("lm.binary"),
-        &dir_path.join("trie"),
-        LM_WEIGHT,
-        VALID_WORD_COUNT_WEIGHT);
+
+    let deepspeech_models_env = "DEEPSPEECH_MODELS";
+    let deepspeech_models_dir = match env::var(deepspeech_models_env) {
+        Ok(v) => v,
+        Err(_) => {
+            let default_dir = env::current_dir().unwrap().join("models/");
+            eprintln!("{} isn't set, defaulting to {:?}", deepspeech_models_env, default_dir);
+            default_dir.to_str().unwrap().to_string()
+        }
+    };
+
+    let dir_path = Path::new(&deepspeech_models_dir);
+    let mut m = match Model::load_from_files(&dir_path.join("output_graph.pb"), BEAM_WIDTH) {
+        Ok(m) => m,
+        Err(_) => {
+            eprintln!("FATAL ERROR, {:?} is an invalid models path", dir_path);
+            std::process::exit(1);
+        }
+    };
+    m.enable_decoder_with_lm(&dir_path.join("lm.binary"), &dir_path.join("trie"), LM_WEIGHT, VALID_WORD_COUNT_WEIGHT);
 
     // Obtain the buffer of samples
     let audio_buf :Vec<_> = if desc.sample_rate() == SAMPLE_RATE {
@@ -73,6 +82,11 @@ pub fn convert_audio_to_text(audio_file: std::fs::File) -> (String, String) {
     };
 
     // Run the speech to text algorithm
-    // @TODO handle errors
-    (m.speech_to_text(&audio_buf).unwrap(), extension)
+    match m.speech_to_text(&audio_buf) {
+        Ok(text) => (text, extension),
+        Err(e) => {
+            eprintln!("error converting speech to text: {}", e);
+            ("ERROR".to_string(), extension)
+        }
+    }
 }
