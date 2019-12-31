@@ -29,7 +29,7 @@ Currently there is only one Kakaia client, it runs on Apple's watchOS:
 
 - https://github.com/jeremyandrews/kakaia-watchos/
 
-The client provides a simplistic interface to record audio on the watch, which is then base64 encoded and pushed to the Kakaia engine via the Actix API. The engine decodes the file and use DeepSpeech to convert the audio to text, returning the text on success.
+The client provides a simplistic interface to record audio on the watch, which is then base64 encoded and pushed to the Kakaia engine via an Actix API. The engine decodes the file and uses DeepSpeech to convert the audio to text, returning the text on success.
 
 ### Notes
 
@@ -80,6 +80,7 @@ Kakaia watchOS app:
 
 - parse returned JSON, set timer when the command is received
 - display errors if no command was matched
+- submit to App Store
 
 ### Phase n: Future plans
 
