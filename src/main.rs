@@ -84,6 +84,7 @@ fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: Str
                 let hour = now.format("%H");
                 let minute = now.format("%M");
                 let second = now.format("%S");
+                // @TODO: add correct file extension
                 let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.wav", archive_directory, &hour, &minute, &second)) {
                     Ok(b) => b,
                     Err(e) => {

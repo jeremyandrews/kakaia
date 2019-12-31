@@ -8,20 +8,36 @@ Build Kakaia as follows:
 
 1. Download the appropriate native_client from https://github.com/mozilla/DeepSpeech/releases/tag/v0.6.0 and extract locally
 1. export LD_LIBRARY_PATH and LIBRARY_PATH both pointing to the files extracted in the previous step. For example:
+
     ```
     export LD_LIBRARY_PATH=~/devel/speech/deepspeech-rs/native_client/
     export LIBRARY_PATH=~/devel/speech/deepspeech-rs/native_client/
     ```
+
 1. Download the [0.6.0 models](https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-models.tar.gz) from https://github.com/mozilla/DeepSpeech/releases/tag/v0.6.0 and extract locally
 1. @TODO: _currently the model location is hard-coded to: /home/jandrews/devel/speech/DeepSpeech-0.6.0/models/ -- obviously this has to be made configurable_
 1. Build the Kakaia engine: `cargo build --release`
-1. Run the Kakaia engine, see available configuration as follows: `./targets/release/kakaia -h`
 
-The engine can be tested as follows:
-    ```
+Run the Kakaia engine using all defaults as follows:
+
+    ./targets/release/kakaia
+
+Learn about available options by passing in the `-h` parameter.
+
+    ./targets/release/kakaia -h
+
+For example, to save a copy of all audio files and text conversions, pass in the `-s` parameter:
+
+    ./targets/release/kakaia -s
+
+Or, to listen on a different port, you could pass in the following:
+
+    ./targets/release/kakaia -s --listen 0.0.0.0:8089
+
+You can use `curl` to test the Kakaia engine without a client as follows:
+
     curl --request POST --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
     test
-    ```
 
 ### Kakaia client
 
