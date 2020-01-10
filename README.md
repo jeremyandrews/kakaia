@@ -10,15 +10,15 @@ Build Kakaia as follows:
 1. export `LD_LIBRARY_PATH` and `LIBRARY_PATH` both pointing to the files extracted in the previous step. For example:
 
     ```
-    export LD_LIBRARY_PATH=/opt/deepspeech-rs/native_client/
-    export LIBRARY_PATH=/opt/deepspeech-rs/native_client/
+    export LD_LIBRARY_PATH=/opt/deepspeech/native_client/
+    export LIBRARY_PATH=/opt/deepspeech/native_client/
     ```
 
 1. Download the [0.6.0 models](https://github.com/mozilla/DeepSpeech/releases/download/v0.6.0/deepspeech-0.6.0-models.tar.gz) from https://github.com/mozilla/DeepSpeech/releases/tag/v0.6.0 and extract locally
 1. export `DEEPSPEECH_MODELS` pointing to the files extracted in the previous step. (By default it will look for `models/` in the current working directory.) For example:
 
     ```
-    export DEEPSPEECH_MODELS=/opt/models/
+    export DEEPSPEECH_MODELS=/opt/deepspeech/models/
     ```
 
 1. Build the Kakaia engine: `cargo build --release`
