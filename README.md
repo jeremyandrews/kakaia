@@ -94,15 +94,15 @@ Once the above is fully working, the next step will be to give Kakaia some very 
 
 Kakaia engine:
 
-- engine return data via API as JSON
+- return text and metadata as JSON
 - match text against a single phrase: "set timer for n seconds/minutes/hours"
-- on success, return a machine-readable command to client
-- on failure, return a machine-readable error
+- if successfully matched, return a machine-readable command to client
+- if not succesfully matched, return a machine-readable error
 
 Kakaia watchOS app:
 
-- parse returned JSON, set timer when the command is received
-- display errors if no command was matched
+- parse JSON, set timer when command is received
+- display useful error if no command was recognized
 - submit to App Store
 
 ### Phase n: Future plans
@@ -110,16 +110,17 @@ Kakaia watchOS app:
 Functionality:
 
 - stream audio so conversion to text happens while user is speaking
-- encrypt data sent between client(s) and engine so it can be sent across public networks without fear of eavesdropping
-- training: allow training of words/phrases, explore how to improve audio to text conversion (and to add support for unrecognized words, such as "kakaia")
-- add commmand for getting weather information
-- add command for setting reminders
-- add command for creating/updating todo lists
-- add commands for controlling smart devices
-- add support for dictating emails/lengthy texts
-- add punctuation (either spoken words ie "comma", or automatically based on the metadata identifying pauses, etc)
-- attempt to recognize different speakers and identify them in the text
 - push notifications from engine to client(s)
+- encrypt data sent between client(s) and engine so it can be securely sent across public networks
+- training: allow training of words/phrases, explore how to improve audio to text conversion (and to add support for unrecognized words, such as "kakaia")
+- add punctuation (either spoken words ie "comma", or automatically based on the metadata identifying pauses, etc)
+- attempt to recognize different speakers and optionally identify them in the text, or filter extraneous speakers
+- add additional commands:
+  - getting weather information
+  - controlling smart devices
+  - setting reminders
+  - creating/updating todo lists
+  - dictating emails/notes
 
 Additional clients:
 
