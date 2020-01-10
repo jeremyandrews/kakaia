@@ -30,8 +30,9 @@ struct Configuration {
     store: bool,
 }
 
-fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: String) -> impl Responder {
+fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspeech_data: web::Data<Mutex<speech::KakaiaDeepSpeech>>, base64_audio: String) -> impl Responder {
     let config = config_data.lock().unwrap();
+    let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
 
     // Load audio.bytes from String
     let audio_bytes = match base64::decode(&base64_audio) {
@@ -73,7 +74,7 @@ fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: Str
     }
 
     // Convert audio file to text.
-    let (message, extension) = speech::convert_audio_to_text(audio_file);
+    let converted: speech::AudioAsText = kakaia_deepspeech.convert_audio_to_text(audio_file);
 
     // Optionally store a copy of the audio and text
     if config.store {
@@ -84,7 +85,7 @@ fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: Str
                 let hour = now.format("%H");
                 let minute = now.format("%M");
                 let second = now.format("%S");
-                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.{}", archive_directory, &hour, &minute, &second, extension)) {
+                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.{}", archive_directory, &hour, &minute, &second, converted.extension)) {
                     Ok(b) => b,
                     Err(e) => {
                         // @TODO: deal with this gracefully
@@ -111,7 +112,7 @@ fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: Str
                         return "error archiving text conversion of audio file".to_string();
                     }
                 };
-                match writeln!(buffer, "{}", &message) {
+                match writeln!(buffer, "{}", &converted.text) {
                     Ok(_) => (),
                     Err(e) => eprintln!("failed to archive text conversion of audio file: {}", e),
                 }
@@ -123,20 +124,25 @@ fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, base64_audio: Str
     }
 
     // Debug output for now:
-    println!("{}", &message);
+    println!("{}", &converted.text);
     // Return text
-    format!("{}\n", message)
+    format!("{}\n", converted.text)
 }
 
 fn main() {
     // @TODO: do we really need three copies of this?
+    // Configuration structure for server configuration
     let config_server = Configuration::from_args();
+    // Configuration structure for client configuration
     let config_web = config_server.clone();
+    // Configuration structure for client process
     let config_data = web::Data::new(Mutex::new(config_server.clone()));
+    let deepspeech_data = web::Data::new(Mutex::new(speech::KakaiaDeepSpeech::new()));
 
     let server = HttpServer::new(move || {
         App::new()
             .register_data(config_data.clone())
+            .register_data(deepspeech_data.clone())
             .service(
                 web::resource("/convert/audio/text").data(
                     String::configure(|cfg| {
