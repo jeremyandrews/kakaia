@@ -1,17 +1,24 @@
 use std::env;
+use std::io::Write;
 use std::path::Path;
+use std::sync::Mutex;
 
+use actix_web::{Responder, web};
 use audrey::read::Reader;
 use audrey::sample::interpolate::{Converter, Linear};
 use audrey::sample::signal::{from_iter, Signal};
+use chrono::{DateTime, Utc};
 use deepspeech::Model;
+use tempfile::NamedTempFile;
+
+use crate::Configuration;
 
 
 // These constants are taken from the C++ sources of the client.
 const BEAM_WIDTH :u16 = 500;
 const LM_WEIGHT :f32 = 0.75;
 const VALID_WORD_COUNT_WEIGHT :f32 = 1.85;
-// The model has been trained on this specific sample rate.
+// The provided model was trained on this specific sample rate.
 const SAMPLE_RATE :u32 = 16_000;
 
 pub struct AudioAsText {
@@ -35,8 +42,6 @@ impl KakaiaDeepSpeech {
                 default_dir.to_str().unwrap().to_string()
             }
         };
-
-        // Run the speech to text algorithm
         let dir_path = Path::new(&model_dir);
         let mut deepspeech_model = match Model::load_from_files(&dir_path.join("output_graph.pb"), BEAM_WIDTH) {
             Ok(m) => m,
@@ -46,7 +51,6 @@ impl KakaiaDeepSpeech {
             }
         };
         deepspeech_model.enable_decoder_with_lm(&dir_path.join("lm.binary"), &dir_path.join("trie"), LM_WEIGHT, VALID_WORD_COUNT_WEIGHT);
-
         KakaiaDeepSpeech {
             model: deepspeech_model,
         }
@@ -119,4 +123,103 @@ impl KakaiaDeepSpeech {
             extension: extension,
         }
     }
+}
+
+pub fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>, base64_audio: String) -> impl Responder {
+    let config = config_data.lock().unwrap();
+    let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
+
+    // Load audio.bytes from String
+    let audio_bytes = match base64::decode(&base64_audio) {
+        Ok(audio) => audio,
+        Err(e) => {
+            // @TODO: logging, properly handle this error
+            let error = format!("failed to decode audio.data: {}", e);
+            eprintln!("{}", &error);
+            return error;
+        }
+    };
+
+    // Create a temporary file.
+    let mut temporary_file = match NamedTempFile::new() {
+        Ok(f) => f,
+        Err(e) => {
+            return format!("failed to create temporary file: {}", e);
+        }
+    };
+
+    // Grab a pointer to the beginning of the file.
+    let audio_file = match temporary_file.reopen() {
+        Ok(a) => a,
+        Err(e) => {
+            return format!("failed to open temporary file: {}", e);
+        }
+    };
+
+    // Write audio.bytes into temporary file.
+    let mut pos = 0;
+    while pos < audio_bytes.len() {
+        let bytes_written = match temporary_file.write(&audio_bytes[pos..]) {
+            Ok(b) => b,
+            Err(e) => {
+                return format!("failed to create temporary file: {}", e);
+            }
+        };
+        pos += bytes_written;
+    }
+
+    // Convert audio file to text.
+    let converted: AudioAsText = kakaia_deepspeech.convert_audio_to_text(audio_file);
+
+    // Optionally store a copy of the audio and text
+    if config.store {
+        let now: DateTime<Utc> = Utc::now();
+        let archive_directory = format!("archive/{}/{}/{}/", now.format("%Y"), now.format("%m"), now.format("%d"));
+        match std::fs::create_dir_all(&archive_directory) {
+            Ok(_) =>  {
+                let hour = now.format("%H");
+                let minute = now.format("%M");
+                let second = now.format("%S");
+                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.{}", archive_directory, &hour, &minute, &second, converted.extension)) {
+                    Ok(b) => b,
+                    Err(e) => {
+                        // @TODO: deal with this gracefully
+                        eprintln!("failed to create archive copy of audio file: {}", e);
+                        return "error archiving audio file".to_string();
+                    }
+                };
+                // Write audio.bytes into temporary file.
+                let mut pos = 0;
+                while pos < audio_bytes.len() {
+                    let bytes_written = match buffer.write(&audio_bytes[pos..]) {
+                        Ok(b) => b,
+                        Err(e) => {
+                            return format!("failed to write archive file: {}", e);
+                        }
+                    };
+                    pos += bytes_written;
+                }
+                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.txt", archive_directory, &hour, &minute, &second)) {
+                    Ok(b) => b,
+                    Err(e) => {
+                        // @TODO: deal with this gracefully
+                        eprintln!("failed to create archive text conversion of audio file: {}", e);
+                        return "error archiving text conversion of audio file".to_string();
+                    }
+                };
+                match writeln!(buffer, "{}", &converted.text) {
+                    Ok(_) => (),
+                    Err(e) => eprintln!("failed to archive text conversion of audio file: {}", e),
+                }
+            }
+            Err(e) => {
+                eprintln!("failed to create directory: '{}', {}", &archive_directory, e);
+            }
+        }
+    }
+
+    // Debug output for now:
+    println!("{}", &converted.text);
+    // Return text
+    format!("{}\n", converted.text)
 }
