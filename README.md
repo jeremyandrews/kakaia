@@ -85,7 +85,7 @@ Kakaia watchOS app:
 - provide a simplistic UI for recording voice (done)
 - send audio recording to API (done)
 - wait for conversion (done)
-- display text version on app screen (not done)
+- display text version on app screen (done)
 - add configuration (currently it's hard-coded to my environment)
 
 ### Phase 2: Basic functionality
