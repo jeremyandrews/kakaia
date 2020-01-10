@@ -125,7 +125,7 @@ impl KakaiaDeepSpeech {
     }
 }
 
-pub fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>, base64_audio: String) -> impl Responder {
+pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>, base64_audio: String) -> impl Responder {
     let config = config_data.lock().unwrap();
     let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
 
