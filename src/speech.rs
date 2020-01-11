@@ -3,7 +3,7 @@ use std::io::Write;
 use std::path::Path;
 use std::sync::Mutex;
 
-use actix_web::{Responder, web};
+use actix_web::{web, HttpResponse};
 use audrey::read::Reader;
 use audrey::sample::interpolate::{Converter, Linear};
 use audrey::sample::signal::{from_iter, Signal};
@@ -62,7 +62,7 @@ impl KakaiaDeepSpeech {
             Ok(r) => r,
             Err(e) => {
                 return AudioAsText {
-                    text: format!("failed to load audio file ({:?}): {}", audio_file, e),
+                    text: format!("failed to load audio file ({:?}): {}\n", audio_file, e),
                     extension: "unknown".to_string(),
                 }
             }
@@ -125,8 +125,7 @@ impl KakaiaDeepSpeech {
     }
 }
 
-pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>, base64_audio: String) -> impl Responder {
-    let config = config_data.lock().unwrap();
+pub async fn audio_to_text(config: web::Data<Configuration>, deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>, base64_audio: String) -> HttpResponse {
     let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
 
     // Load audio.bytes from String
@@ -134,9 +133,11 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
         Ok(audio) => audio,
         Err(e) => {
             // @TODO: logging, properly handle this error
-            let error = format!("failed to decode audio.data: {}", e);
-            eprintln!("{}", &error);
-            return error;
+            let error = format!("failed to decode audio.data: {}\n", e);
+            eprint!("{}", &error);
+            return HttpResponse::InternalServerError()
+                .content_type("plain/text")
+                .body(error)
         }
     };
 
@@ -144,7 +145,9 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
     let mut temporary_file = match NamedTempFile::new() {
         Ok(f) => f,
         Err(e) => {
-            return format!("failed to create temporary file: {}", e);
+            return HttpResponse::InternalServerError()
+                .content_type("plain/text")
+                .body(format!("failed to create temporary file: {}\n", e))
         }
     };
 
@@ -152,7 +155,9 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
     let audio_file = match temporary_file.reopen() {
         Ok(a) => a,
         Err(e) => {
-            return format!("failed to open temporary file: {}", e);
+            return HttpResponse::InternalServerError()
+                .content_type("plain/text")
+                .body(format!("failed to open temporary file: {}\n", e))
         }
     };
 
@@ -162,7 +167,9 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
         let bytes_written = match temporary_file.write(&audio_bytes[pos..]) {
             Ok(b) => b,
             Err(e) => {
-                return format!("failed to create temporary file: {}", e);
+                return HttpResponse::InternalServerError()
+                    .content_type("plain/text")
+                    .body(format!("failed to create temporary file: {}\n", e))
             }
         };
         pos += bytes_written;
@@ -185,7 +192,9 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
                     Err(e) => {
                         // @TODO: deal with this gracefully
                         eprintln!("failed to create archive copy of audio file: {}", e);
-                        return "error archiving audio file".to_string();
+                        return HttpResponse::InternalServerError()
+                            .content_type("plain/text")
+                            .body(format!("failed to create archive copy of audio file: {}\n", e))
                     }
                 };
                 // Write audio.bytes into temporary file.
@@ -194,7 +203,9 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
                     let bytes_written = match buffer.write(&audio_bytes[pos..]) {
                         Ok(b) => b,
                         Err(e) => {
-                            return format!("failed to write archive file: {}", e);
+                            return HttpResponse::InternalServerError()
+                                .content_type("plain/text")
+                                .body(format!("failed to write archive file: {}\n", e))
                         }
                     };
                     pos += bytes_written;
@@ -204,7 +215,9 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
                     Err(e) => {
                         // @TODO: deal with this gracefully
                         eprintln!("failed to create archive text conversion of audio file: {}", e);
-                        return "error archiving text conversion of audio file".to_string();
+                        return HttpResponse::InternalServerError()
+                            .content_type("plain/text")
+                            .body("error archiving text conversion of audio file\n".to_string())
                     }
                 };
                 match writeln!(buffer, "{}", &converted.text) {
@@ -218,8 +231,11 @@ pub async fn audio_to_text(config_data: web::Data<Mutex<Configuration>>, deepspe
         }
     }
 
+    let body = format!("{}\n", converted.text);
     // Debug output for now:
-    println!("{}", &converted.text);
+    print!("{}", &body);
     // Return text
-    format!("{}\n", converted.text)
+    HttpResponse::Ok()
+        .content_type("plain/text")
+        .body(converted.text)
 }

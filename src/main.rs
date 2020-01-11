@@ -33,13 +33,11 @@ async fn main() -> std::io::Result<()> {
     let config_server = Configuration::from_args();
     // Configuration structure for client configuration
     let config_web = config_server.clone();
-    // Configuration structure for client process
-    let config_data = web::Data::new(Mutex::new(config_server.clone()));
     let deepspeech_data = web::Data::new(Mutex::new(speech::KakaiaDeepSpeech::new()));
 
     HttpServer::new(move || {
         App::new()
-            .app_data(config_data.clone())
+            .data(config_web.clone())
             .app_data(deepspeech_data.clone())
             .service(
                 web::resource("/convert/audio/text").data(
@@ -48,8 +46,7 @@ async fn main() -> std::io::Result<()> {
                         cfg.limit(config_web.bytes)
                     })
                 )
-            )
-            .route("/convert/audio/text/", web::post().to(speech::audio_to_text))
+                .route(web::post().to(speech::audio_to_text)))
         })
         .bind(&config_server.listen)?
         .run()
