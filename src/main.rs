@@ -3,6 +3,8 @@ use std::sync::Mutex;
 use actix_web::{HttpServer, App, web, FromRequest};
 use structopt::StructOpt;
 
+use crate::speech::KakaiaDeepSpeech;
+
 pub mod speech;
 
 #[derive(StructOpt, Debug, Clone)]
@@ -33,7 +35,7 @@ async fn main() -> std::io::Result<()> {
     let config_server = Configuration::from_args();
     // Configuration structure for client configuration
     let config_web = config_server.clone();
-    let deepspeech_data = web::Data::new(Mutex::new(speech::KakaiaDeepSpeech::new()));
+    let deepspeech_data = web::Data::new(Mutex::new(KakaiaDeepSpeech::new()));
 
     HttpServer::new(move || {
         App::new()
@@ -46,7 +48,7 @@ async fn main() -> std::io::Result<()> {
                         cfg.limit(config_web.bytes)
                     })
                 )
-                .route(web::post().to(speech::audio_to_text)))
+                .route(web::post().to(speech::_audio_to_text)))
         })
         .bind(&config_server.listen)?
         .run()
