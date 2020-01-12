@@ -1,7 +1,7 @@
 use std::env;
 use std::io::Write;
 use std::path::Path;
-use std::sync::Mutex;
+use std::sync::{Mutex, Arc};
 
 use actix_web::{web, HttpResponse};
 use audrey::read::Reader;
@@ -125,7 +125,7 @@ impl KakaiaDeepSpeech {
     }
 }
 
-pub async fn _audio_to_text(config: web::Data<Configuration>, deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>, base64_audio: String) -> HttpResponse {
+pub async fn _audio_to_text(config: web::Data<Configuration>, deepspeech_data: web::Data<Arc<Mutex<KakaiaDeepSpeech>>>, base64_audio: String) -> HttpResponse {
     let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
 
     // Load audio.bytes from String
