@@ -40,15 +40,15 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .service(
-                web::resource("/convert/audio/text").app_data(
-                    String::configure(|cfg| {
-                        // limit audio file size in bytes (defaults to 4MB)
-                        cfg.limit(config_web.bytes)
-                    })
-                )
-                .route(web::post().to(speech::_audio_to_text))
+                web::resource("/convert/audio/text")
                 .data(config_web.clone())
-                .app_data(deepspeech_data.clone()))
+                .app_data(deepspeech_data.clone())
+                .app_data(String::configure(|cfg| {
+                    // limit audio file size in bytes (defaults to 4MB)
+                    cfg.limit(config_web.bytes)
+                }))
+                .route(web::post().to(speech::_audio_to_text))
+            )
         })
         .bind(&config_server.listen)?
         .run()
