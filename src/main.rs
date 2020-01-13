@@ -1,4 +1,4 @@
-use std::sync::{Mutex, Arc};
+use std::sync::Mutex;
 
 use actix_web::{HttpServer, App, web, FromRequest};
 use structopt::StructOpt;
@@ -35,14 +35,21 @@ async fn main() -> std::io::Result<()> {
     let config_server = Configuration::from_args();
     // Configuration structure for client configuration
     let config_web = config_server.clone();
-    let deepspeech_data = Arc::new(Mutex::new(KakaiaDeepSpeech::new()));
+    let deepspeech_data = web::Data::new(Mutex::new(KakaiaDeepSpeech::new()));
 
     HttpServer::new(move || {
         App::new()
             .data(config_web.clone())
-            .data(deepspeech_data.clone())
+            .app_data(deepspeech_data.clone())
+            /*
             .service(
-                web::resource("/convert/audio/text").data(
+                web::resource("/convert/audio/text")
+                    .app_data(String::configure(|cfg| cfg.limit(4097)))
+                    .route(web::post().to(speech::_audio_to_text))
+            )
+            */
+            .service(
+                web::resource("/convert/audio/text").app_data(
                     String::configure(|cfg| {
                         // limit audio file size in bytes (defaults to 4MB)
                         cfg.limit(config_web.bytes)
