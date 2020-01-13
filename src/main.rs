@@ -3,6 +3,8 @@ use std::sync::Mutex;
 use actix_web::{HttpServer, App, web, FromRequest};
 use structopt::StructOpt;
 
+use crate::speech::KakaiaDeepSpeech;
+
 pub mod speech;
 
 #[derive(StructOpt, Debug, Clone)]
@@ -27,31 +29,28 @@ pub struct Configuration {
     store: bool,
 }
 
-fn main() {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
     // Configuration structure for server configuration
     let config_server = Configuration::from_args();
     // Configuration structure for client configuration
     let config_web = config_server.clone();
-    // Configuration structure for client process
-    let config_data = web::Data::new(Mutex::new(config_server.clone()));
-    let deepspeech_data = web::Data::new(Mutex::new(speech::KakaiaDeepSpeech::new()));
+    let deepspeech_data = web::Data::new(Mutex::new(KakaiaDeepSpeech::new()));
 
-    let server = HttpServer::new(move || {
+    HttpServer::new(move || {
         App::new()
-            .register_data(config_data.clone())
-            .register_data(deepspeech_data.clone())
             .service(
-                web::resource("/convert/audio/text").data(
-                    String::configure(|cfg| {
-                        // limit audio file size in bytes (defaults to 4MB)
-                        cfg.limit(config_web.bytes)
-                    }))
-                    .route(web::post().to(speech::audio_to_text)),
-                )
-    });
-    // @TODO: handle errors
-    server.bind(&config_server.listen)
-        .unwrap()
+                web::resource("/convert/audio/text")
+                .data(config_web.clone())
+                .app_data(deepspeech_data.clone())
+                .app_data(String::configure(|cfg| {
+                    // limit audio file size in bytes (defaults to 4MB)
+                    cfg.limit(config_web.bytes)
+                }))
+                .route(web::post().to(speech::_audio_to_text))
+            )
+        })
+        .bind(&config_server.listen)?
         .run()
-        .unwrap();
+        .await
 }
