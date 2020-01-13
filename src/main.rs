@@ -39,15 +39,6 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .data(config_web.clone())
-            .app_data(deepspeech_data.clone())
-            /*
-            .service(
-                web::resource("/convert/audio/text")
-                    .app_data(String::configure(|cfg| cfg.limit(4097)))
-                    .route(web::post().to(speech::_audio_to_text))
-            )
-            */
             .service(
                 web::resource("/convert/audio/text").app_data(
                     String::configure(|cfg| {
@@ -55,7 +46,9 @@ async fn main() -> std::io::Result<()> {
                         cfg.limit(config_web.bytes)
                     })
                 )
-                .route(web::post().to(speech::_audio_to_text)))
+                .route(web::post().to(speech::_audio_to_text))
+                .data(config_web.clone())
+                .app_data(deepspeech_data.clone()))
         })
         .bind(&config_server.listen)?
         .run()
