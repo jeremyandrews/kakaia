@@ -9,6 +9,7 @@ use audrey::sample::interpolate::{Converter, Linear};
 use audrey::sample::signal::{from_iter, Signal};
 use chrono::{DateTime, Utc};
 use deepspeech::Model;
+use natural::tokenize::tokenize;
 use tempfile::NamedTempFile;
 
 use crate::Configuration;
@@ -21,8 +22,10 @@ const VALID_WORD_COUNT_WEIGHT :f32 = 1.85;
 // The provided model was trained on this specific sample rate.
 const SAMPLE_RATE :u32 = 16_000;
 
-pub struct AudioAsText {
+#[derive(Debug)]
+pub struct AudioAsText<'a> {
     pub text: String,
+    pub tokenized: Option<Vec<&'a str>>,
     pub extension: String,
 }
 
@@ -61,8 +64,10 @@ impl KakaiaDeepSpeech {
         let mut reader = match Reader::new(&audio_file) {
             Ok(r) => r,
             Err(e) => {
+                let error = format!("failed to load audio file ({:?}): {}\n", audio_file, e);
                 return AudioAsText {
-                    text: format!("failed to load audio file ({:?}): {}\n", audio_file, e),
+                    text: error,
+                    tokenized: None,
                     extension: "unknown".to_string(),
                 }
             }
@@ -82,8 +87,10 @@ impl KakaiaDeepSpeech {
             errors.push(error);
         }
         if errors.len() > 0 {
+            let error = format!("{:?}", errors);
             return AudioAsText {
-                text: format!("{:?}", errors),
+                text: error,
+                tokenized: None,
                 extension: "unknown".to_string(),
             }
         }
@@ -120,6 +127,7 @@ impl KakaiaDeepSpeech {
 
         AudioAsText {
             text: text,
+            tokenized: None,
             extension: extension,
         }
     }
@@ -176,7 +184,7 @@ pub async fn _audio_to_text(config: web::Data<Configuration>, deepspeech_data: w
     }
 
     // Convert audio file to text.
-    let converted: AudioAsText = kakaia_deepspeech.convert_audio_to_text(audio_file);
+    let mut converted: AudioAsText = kakaia_deepspeech.convert_audio_to_text(audio_file);
 
     // Optionally store a copy of the audio and text
     if config.store {
@@ -231,9 +239,11 @@ pub async fn _audio_to_text(config: web::Data<Configuration>, deepspeech_data: w
         }
     }
 
-    let body = format!("{}\n", converted.text);
-    // Debug output for now:
-    print!("{}", &body);
+    // For now display debug output
+    let to_tokenize = converted.text.to_string();
+    converted.tokenized = Some(tokenize(&to_tokenize));
+    println!("{:?}", converted);
+
     // Return text
     HttpResponse::Ok()
         .content_type("plain/text")
