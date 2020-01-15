@@ -5,6 +5,11 @@ pub struct StopWords {
     set: HashSet<String>,
 }
 
+pub struct Tokens<'a> {
+    pub unfiltered: Vec<&'a str>,
+    pub filtered: Vec<&'a str>,
+}
+
 impl StopWords {
     // Derived from http://xpo6.com/list-of-english-stop-words/
     pub fn new() -> Self {
@@ -79,7 +84,7 @@ impl StopWords {
         stopwords.insert("detail".to_string());
         stopwords.insert("do".to_string());
         stopwords.insert("done".to_string());
-        stopwords.insert("down".to_string());
+        //stopwords.insert("down".to_string());
         stopwords.insert("due".to_string());
         stopwords.insert("during".to_string());
         stopwords.insert("each".to_string());
@@ -284,7 +289,7 @@ impl StopWords {
         stopwords.insert("un".to_string());
         stopwords.insert("under".to_string());
         stopwords.insert("until".to_string());
-        stopwords.insert("up".to_string());
+        //stopwords.insert("up".to_string());
         stopwords.insert("upon".to_string());
         stopwords.insert("us".to_string());
         stopwords.insert("very".to_string());
@@ -325,17 +330,21 @@ impl StopWords {
         }
     }
 
-    pub fn filter<'a>(&self, mut tokenized: Vec<&'a str>) -> Option<Vec<&'a str>> {
+    pub fn filter<'a>(&self, mut filter: Vec<&'a str>) -> Tokens<'a> {
         // remove stopwords from tokenized text
         let mut i = 0;
-        while i != tokenized.len() {
-            let needle = tokenized[i].to_string();
+        let mut filtered: Vec<&str> = vec![];
+        while i != filter.len() {
+            let needle = filter[i].to_string();
             if self.set.contains(&needle) {
-                tokenized.remove(i);
+                filtered.push(filter.remove(i));
             } else {
                 i += 1;
             }
         }
-        Some(tokenized)
+        Tokens {
+            unfiltered: filter,
+            filtered: filtered,
+        }
     }
 }

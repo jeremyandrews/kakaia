@@ -13,7 +13,7 @@ use natural::tokenize::tokenize;
 use tempfile::NamedTempFile;
 
 use crate::Configuration;
-use crate::stopwords::StopWords;
+use crate::stopwords::{StopWords, Tokens};
 
 
 // These constants are taken from the C++ sources of the client.
@@ -25,10 +25,11 @@ const SAMPLE_RATE :u32 = 16_000;
 
 #[derive(Debug)]
 pub struct AudioAsText<'a> {
-    pub text: String,
+    pub raw: String,
     pub tokenized: Option<Vec<&'a str>>,
+    pub keywords: Option<Vec<&'a str>>,
     pub filtered: Option<Vec<&'a str>>,
-    pub extension: String,
+    pub filetype: String,
 }
 
 pub struct KakaiaDeepSpeech {
@@ -68,10 +69,11 @@ impl KakaiaDeepSpeech {
             Err(e) => {
                 let error = format!("failed to load audio file ({:?}): {}\n", audio_file, e);
                 return AudioAsText {
-                    text: error,
+                    raw: error,
                     tokenized: None,
+                    keywords: None,
                     filtered: None,
-                    extension: "unknown".to_string(),
+                    filetype: "unknown".to_string(),
                 }
             }
         };
@@ -92,10 +94,11 @@ impl KakaiaDeepSpeech {
         if errors.len() > 0 {
             let error = format!("{:?}", errors);
             return AudioAsText {
-                text: error,
+                raw: error,
                 tokenized: None,
+                keywords: None,
                 filtered: None,
-                extension: "unknown".to_string(),
+                filetype: "unknown".to_string(),
             }
         }
 
@@ -130,10 +133,11 @@ impl KakaiaDeepSpeech {
         };
 
         AudioAsText {
-            text: text,
+            raw: text,
             tokenized: None,
+            keywords: None,
             filtered: None,
-            extension: extension,
+            filetype: extension,
         }
     }
 }
@@ -205,7 +209,7 @@ pub async fn _audio_to_text(
                 let hour = now.format("%H");
                 let minute = now.format("%M");
                 let second = now.format("%S");
-                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.{}", archive_directory, &hour, &minute, &second, converted.extension)) {
+                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.{}", archive_directory, &hour, &minute, &second, converted.filetype)) {
                     Ok(b) => b,
                     Err(e) => {
                         // @TODO: deal with this gracefully
@@ -238,7 +242,7 @@ pub async fn _audio_to_text(
                             .body("error archiving text conversion of audio file\n".to_string())
                     }
                 };
-                match writeln!(buffer, "{}", &converted.text) {
+                match writeln!(buffer, "{}", &converted.raw) {
                     Ok(_) => (),
                     Err(e) => eprintln!("failed to archive text conversion of audio file: {}", e),
                 }
@@ -250,13 +254,15 @@ pub async fn _audio_to_text(
     }
 
     // For now display debug output
-    let to_tokenize = converted.text.to_string();
+    let to_tokenize = converted.raw.to_string();
     converted.tokenized = Some(tokenize(&to_tokenize));
-    converted.filtered = stop_words.filter(converted.tokenized.clone().unwrap());
+    let tokens: Tokens = stop_words.filter(converted.tokenized.clone().unwrap());
+    converted.filtered = Some(tokens.filtered);
+    converted.keywords = Some(tokens.unfiltered);
     println!("{:?}", converted);
 
     // Return text
     HttpResponse::Ok()
         .content_type("plain/text")
-        .body(converted.text)
+        .body(converted.raw)
 }
