@@ -253,12 +253,18 @@ pub async fn _audio_to_text(
         }
     }
 
-    // For now display debug output
     let to_tokenize = converted.raw.to_string();
     converted.tokenized = Some(tokenize(&to_tokenize));
+    // Remove stopwords, extract command keywords
     let tokens: Tokens = stop_words.filter(converted.tokenized.clone().unwrap());
-    converted.filtered = Some(tokens.filtered);
-    converted.keywords = Some(tokens.unfiltered);
+    if !tokens.filtered.is_empty() {
+        converted.filtered = Some(tokens.filtered);
+    }
+    if !tokens.unfiltered.is_empty() {
+        converted.keywords = Some(tokens.unfiltered);
+    }
+
+    // For now display debug output
     println!("{:?}", converted);
 
     // Return text
