@@ -13,6 +13,7 @@ use natural::tokenize::tokenize;
 use tempfile::NamedTempFile;
 
 use crate::Configuration;
+use crate::stopwords::StopWords;
 
 
 // These constants are taken from the C++ sources of the client.
@@ -26,6 +27,7 @@ const SAMPLE_RATE :u32 = 16_000;
 pub struct AudioAsText<'a> {
     pub text: String,
     pub tokenized: Option<Vec<&'a str>>,
+    pub filtered: Option<Vec<&'a str>>,
     pub extension: String,
 }
 
@@ -68,6 +70,7 @@ impl KakaiaDeepSpeech {
                 return AudioAsText {
                     text: error,
                     tokenized: None,
+                    filtered: None,
                     extension: "unknown".to_string(),
                 }
             }
@@ -91,6 +94,7 @@ impl KakaiaDeepSpeech {
             return AudioAsText {
                 text: error,
                 tokenized: None,
+                filtered: None,
                 extension: "unknown".to_string(),
             }
         }
@@ -128,12 +132,18 @@ impl KakaiaDeepSpeech {
         AudioAsText {
             text: text,
             tokenized: None,
+            filtered: None,
             extension: extension,
         }
     }
 }
 
-pub async fn _audio_to_text(config: web::Data<Configuration>, deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>, base64_audio: String) -> HttpResponse {
+pub async fn _audio_to_text(
+        config: web::Data<Configuration>,
+        stop_words: web::Data<StopWords>,
+        deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>,
+        base64_audio: String
+    ) -> HttpResponse {
     let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
 
     // Load audio.bytes from String
@@ -242,6 +252,7 @@ pub async fn _audio_to_text(config: web::Data<Configuration>, deepspeech_data: w
     // For now display debug output
     let to_tokenize = converted.text.to_string();
     converted.tokenized = Some(tokenize(&to_tokenize));
+    converted.filtered = stop_words.filter(converted.tokenized.clone().unwrap());
     println!("{:?}", converted);
 
     // Return text

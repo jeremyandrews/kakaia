@@ -4,8 +4,10 @@ use actix_web::{HttpServer, App, web, FromRequest};
 use structopt::StructOpt;
 
 use crate::speech::KakaiaDeepSpeech;
+use crate::stopwords::StopWords;
 
 pub mod speech;
+pub mod stopwords;
 
 #[derive(StructOpt, Debug, Clone)]
 #[structopt(name = "kakaia")]
@@ -35,6 +37,9 @@ async fn main() -> std::io::Result<()> {
     let config_server = Configuration::from_args();
     // Configuration structure for client configuration
     let config_web = config_server.clone();
+    // Initialize stop word hashset
+    let stop_words = StopWords::new();
+    // Initialize DeepSpeech models
     let deepspeech_data = web::Data::new(Mutex::new(KakaiaDeepSpeech::new()));
 
     HttpServer::new(move || {
@@ -42,6 +47,7 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::resource("/convert/audio/text")
                 .data(config_web.clone())
+                .data(stop_words.clone())
                 .app_data(deepspeech_data.clone())
                 .app_data(String::configure(|cfg| {
                     // limit audio file size in bytes (defaults to 4MB)
