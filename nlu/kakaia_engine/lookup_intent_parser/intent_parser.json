@@ -1,0 +1,59 @@
+{
+  "config": {
+    "ignore_stop_words": true,
+    "unit_name": "lookup_intent_parser"
+  },
+  "entity_scopes": [
+    {
+      "entity_scope": {
+        "builtin": [
+          "snips/duration"
+        ],
+        "custom": []
+      },
+      "intent_group": [
+        "setTimer"
+      ]
+    }
+  ],
+  "intents_names": [
+    "setTimer"
+  ],
+  "language_code": "en",
+  "map": {
+    "542811207": [
+      0,
+      [
+        0
+      ]
+    ],
+    "615069775": [
+      0,
+      [
+        0
+      ]
+    ],
+    "1067490550": [
+      0,
+      [
+        0
+      ]
+    ],
+    "1263780835": [
+      0,
+      [
+        0
+      ]
+    ],
+    "1996537062": [
+      0,
+      [
+        0
+      ]
+    ]
+  },
+  "slots_names": [
+    "duration"
+  ],
+  "stop_words_whitelist": {}
+}

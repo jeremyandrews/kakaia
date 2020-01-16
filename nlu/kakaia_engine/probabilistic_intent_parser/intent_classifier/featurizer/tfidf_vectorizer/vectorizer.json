@@ -1,0 +1,35 @@
+{
+  "builtin_entity_scope": [
+    "snips/duration"
+  ],
+  "config": {
+    "unit_name": "tfidf_vectorizer",
+    "use_stemming": false,
+    "word_clusters_name": null
+  },
+  "language_code": "en",
+  "vectorizer": {
+    "idf_diag": [
+      2.5769147207285403,
+      2.751268107873318,
+      4.186352633162641,
+      4.186352633162641,
+      4.186352633162641,
+      3.4932054526026954,
+      3.5985659682605218,
+      2.751268107873318,
+      3.5985659682605218
+    ],
+    "vocab": {
+      "a": 0,
+      "builtinentityfeaturesnipsduration": 1,
+      "can": 2,
+      "initiate": 3,
+      "please": 4,
+      "set": 5,
+      "start": 6,
+      "timer": 7,
+      "you": 8
+    }
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "snips/duration": {}
+  },
+  "intents": {
+    "setTimer": {
+      "utterances": [
+        {
+          "data": [
+            {
+              "text": "Set the timer "
+            },
+            {
+              "entity": "snips/duration",
+              "slot_name": "duration",
+              "text": "for five minutes"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Please set a "
+            },
+            {
+              "entity": "snips/duration",
+              "slot_name": "duration",
+              "text": "three hour"
+            },
+            {
+              "text": " timer"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Start a timer of "
+            },
+            {
+              "entity": "snips/duration",
+              "slot_name": "duration",
+              "text": "half an hour"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Can you start a timer "
+            },
+            {
+              "entity": "snips/duration",
+              "slot_name": "duration",
+              "text": "for eight minutes"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Initiate a timer "
+            },
+            {
+              "entity": "snips/duration",
+              "slot_name": "duration",
+              "text": "for thirteen minutes"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "language": "en"
+}

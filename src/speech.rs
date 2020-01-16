@@ -9,11 +9,10 @@ use audrey::sample::interpolate::{Converter, Linear};
 use audrey::sample::signal::{from_iter, Signal};
 use chrono::{DateTime, Utc};
 use deepspeech::Model;
-use natural::tokenize::tokenize;
 use tempfile::NamedTempFile;
 
 use crate::Configuration;
-use crate::stopwords::{StopWords, Tokens};
+use crate::nlu::NLU;
 
 
 // These constants are taken from the C++ sources of the client.
@@ -24,11 +23,8 @@ const VALID_WORD_COUNT_WEIGHT :f32 = 1.85;
 const SAMPLE_RATE :u32 = 16_000;
 
 #[derive(Debug)]
-pub struct AudioAsText<'a> {
+pub struct AudioAsText {
     pub raw: String,
-    pub tokenized: Option<Vec<&'a str>>,
-    pub keywords: Option<Vec<&'a str>>,
-    pub filtered: Option<Vec<&'a str>>,
     pub filetype: String,
 }
 
@@ -70,9 +66,6 @@ impl KakaiaDeepSpeech {
                 let error = format!("failed to load audio file ({:?}): {}\n", audio_file, e);
                 return AudioAsText {
                     raw: error,
-                    tokenized: None,
-                    keywords: None,
-                    filtered: None,
                     filetype: "unknown".to_string(),
                 }
             }
@@ -95,9 +88,6 @@ impl KakaiaDeepSpeech {
             let error = format!("{:?}", errors);
             return AudioAsText {
                 raw: error,
-                tokenized: None,
-                keywords: None,
-                filtered: None,
                 filetype: "unknown".to_string(),
             }
         }
@@ -134,9 +124,6 @@ impl KakaiaDeepSpeech {
 
         AudioAsText {
             raw: text,
-            tokenized: None,
-            keywords: None,
-            filtered: None,
             filetype: extension,
         }
     }
@@ -144,11 +131,12 @@ impl KakaiaDeepSpeech {
 
 pub async fn _audio_to_text(
         config: web::Data<Configuration>,
-        stop_words: web::Data<StopWords>,
         deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>,
+        nlu_data: web::Data<Mutex<NLU>>,
         base64_audio: String
     ) -> HttpResponse {
     let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
+    let nlu = nlu_data.lock().unwrap();
 
     // Load audio.bytes from String
     let audio_bytes = match base64::decode(&base64_audio) {
@@ -198,7 +186,7 @@ pub async fn _audio_to_text(
     }
 
     // Convert audio file to text.
-    let mut converted: AudioAsText = kakaia_deepspeech.convert_audio_to_text(audio_file);
+    let converted: AudioAsText = kakaia_deepspeech.convert_audio_to_text(audio_file);
 
     // Optionally store a copy of the audio and text
     if config.store {
@@ -253,22 +241,21 @@ pub async fn _audio_to_text(
         }
     }
 
-    let to_tokenize = converted.raw.to_string();
-    converted.tokenized = Some(tokenize(&to_tokenize));
-    // Remove stopwords, extract command keywords
-    let tokens: Tokens = stop_words.filter(converted.tokenized.clone().unwrap());
-    if !tokens.filtered.is_empty() {
-        converted.filtered = Some(tokens.filtered);
-    }
-    if !tokens.unfiltered.is_empty() {
-        converted.keywords = Some(tokens.unfiltered);
-    }
+    let parsed = nlu.engine.parse(&converted.raw, None, None).unwrap();
+    println!("NLU: {:?}", &parsed);
 
-    // For now display debug output
-    println!("{:?}", converted);
+    let _set_timer: String = "setTimer".to_string();
+    let intent = match &parsed.intent.intent_name {
+        None => "none".to_string(),
+        Some(_set_timer) => {
+            let json_result = serde_json::to_value(&parsed).unwrap();
+            let seconds = nlu.duration_as_seconds(&json_result["slots"][0]["value"]);
+            format!("set timer for {} seconds", seconds)
+        }
+    };
 
     // Return text
     HttpResponse::Ok()
         .content_type("plain/text")
-        .body(converted.raw)
+        .body(format!("Action: {}", intent))
 }
