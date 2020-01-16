@@ -37,9 +37,12 @@ async fn main() -> std::io::Result<()> {
     // Configuration structure for client configuration
     let config_web = config_server.clone();
     // Initialize DeepSpeech models
+    println!("Loading Deepspeech model...");
     let deepspeech_data = web::Data::new(Mutex::new(KakaiaDeepSpeech::new()));
     // Initialize Snips NLU engine
+    println!("Loading Snips NLU engine...");
     let nlu_data = web::Data::new(Mutex::new(NLU::new()));
+    println!("Launched.");
 
     HttpServer::new(move || {
         App::new().service(
