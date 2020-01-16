@@ -14,7 +14,7 @@ impl NLU {
                     eprintln!("Error loadinh SnipsNluEngine: {}", e);
                     std::process::exit(1);
                 }
-            }
+            },
         }
     }
 

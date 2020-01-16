@@ -11,16 +11,15 @@ use chrono::{DateTime, Utc};
 use deepspeech::Model;
 use tempfile::NamedTempFile;
 
-use crate::Configuration;
 use crate::nlu::NLU;
-
+use crate::Configuration;
 
 // These constants are taken from the C++ sources of the client.
-const BEAM_WIDTH :u16 = 500;
-const LM_WEIGHT :f32 = 0.75;
-const VALID_WORD_COUNT_WEIGHT :f32 = 1.85;
+const BEAM_WIDTH: u16 = 500;
+const LM_WEIGHT: f32 = 0.75;
+const VALID_WORD_COUNT_WEIGHT: f32 = 1.85;
 // The provided model was trained on this specific sample rate.
-const SAMPLE_RATE :u32 = 16_000;
+const SAMPLE_RATE: u32 = 16_000;
 
 #[derive(Debug)]
 pub struct AudioAsText {
@@ -40,19 +39,28 @@ impl KakaiaDeepSpeech {
             Ok(d) => d,
             Err(_) => {
                 let default_dir = env::current_dir().unwrap().join("models/");
-                eprintln!("DeepSpeechModel: {} isn't set, defaulting to {:?}", DEEPSPEECH_MODELS_ENV, default_dir);
+                eprintln!(
+                    "DeepSpeechModel: {} isn't set, defaulting to {:?}",
+                    DEEPSPEECH_MODELS_ENV, default_dir
+                );
                 default_dir.to_str().unwrap().to_string()
             }
         };
         let dir_path = Path::new(&model_dir);
-        let mut deepspeech_model = match Model::load_from_files(&dir_path.join("output_graph.pb"), BEAM_WIDTH) {
-            Ok(m) => m,
-            Err(_) => {
-                eprintln!("FATAL ERROR, {:?} is an invalid models path", dir_path);
-                std::process::exit(1);
-            }
-        };
-        deepspeech_model.enable_decoder_with_lm(&dir_path.join("lm.binary"), &dir_path.join("trie"), LM_WEIGHT, VALID_WORD_COUNT_WEIGHT);
+        let mut deepspeech_model =
+            match Model::load_from_files(&dir_path.join("output_graph.pb"), BEAM_WIDTH) {
+                Ok(m) => m,
+                Err(_) => {
+                    eprintln!("FATAL ERROR, {:?} is an invalid models path", dir_path);
+                    std::process::exit(1);
+                }
+            };
+        deepspeech_model.enable_decoder_with_lm(
+            &dir_path.join("lm.binary"),
+            &dir_path.join("trie"),
+            LM_WEIGHT,
+            VALID_WORD_COUNT_WEIGHT,
+        );
         KakaiaDeepSpeech {
             model: deepspeech_model,
         }
@@ -67,7 +75,7 @@ impl KakaiaDeepSpeech {
                 return AudioAsText {
                     raw: error,
                     filetype: "unknown".to_string(),
-                }
+                };
             }
         };
 
@@ -75,12 +83,19 @@ impl KakaiaDeepSpeech {
         // Validate the audio file.
         let mut errors: Vec<String> = vec![];
         if desc.channel_count() != 1 {
-            let error = format!("audio file must have exactly 1 track, not {}", desc.channel_count());
+            let error = format!(
+                "audio file must have exactly 1 track, not {}",
+                desc.channel_count()
+            );
             eprintln!("{}", &error);
             errors.push(error);
         }
         if desc.sample_rate() != SAMPLE_RATE {
-            let error = format!("audio sample rate must be {}, not {}", SAMPLE_RATE, desc.sample_rate());
+            let error = format!(
+                "audio sample rate must be {}, not {}",
+                SAMPLE_RATE,
+                desc.sample_rate()
+            );
             eprintln!("{}", &error);
             errors.push(error);
         }
@@ -89,11 +104,11 @@ impl KakaiaDeepSpeech {
             return AudioAsText {
                 raw: error,
                 filetype: "unknown".to_string(),
-            }
+            };
         }
 
         // Obtain the buffer of samples
-        let audio_buffer :Vec<_> = if desc.sample_rate() == SAMPLE_RATE {
+        let audio_buffer: Vec<_> = if desc.sample_rate() == SAMPLE_RATE {
             reader.samples().map(|s| s.unwrap()).collect()
         } else {
             // We need to interpolate to the target sample rate
@@ -102,7 +117,8 @@ impl KakaiaDeepSpeech {
                 from_iter(reader.samples::<i16>().map(|s| [s.unwrap()])),
                 interpolator,
                 desc.sample_rate() as f64,
-                SAMPLE_RATE as f64);
+                SAMPLE_RATE as f64,
+            );
             conv.until_exhausted().map(|v| v[0]).collect()
         };
 
@@ -130,11 +146,11 @@ impl KakaiaDeepSpeech {
 }
 
 pub async fn _audio_to_text(
-        config: web::Data<Configuration>,
-        deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>,
-        nlu_data: web::Data<Mutex<NLU>>,
-        base64_audio: String
-    ) -> HttpResponse {
+    config: web::Data<Configuration>,
+    deepspeech_data: web::Data<Mutex<KakaiaDeepSpeech>>,
+    nlu_data: web::Data<Mutex<NLU>>,
+    base64_audio: String,
+) -> HttpResponse {
     let mut kakaia_deepspeech = deepspeech_data.lock().unwrap();
     let nlu = nlu_data.lock().unwrap();
 
@@ -147,7 +163,7 @@ pub async fn _audio_to_text(
             eprint!("{}", &error);
             return HttpResponse::InternalServerError()
                 .content_type("plain/text")
-                .body(error)
+                .body(error);
         }
     };
 
@@ -191,20 +207,31 @@ pub async fn _audio_to_text(
     // Optionally store a copy of the audio and text
     if config.store {
         let now: DateTime<Utc> = Utc::now();
-        let archive_directory = format!("archive/{}/{}/{}/", now.format("%Y"), now.format("%m"), now.format("%d"));
+        let archive_directory = format!(
+            "archive/{}/{}/{}/",
+            now.format("%Y"),
+            now.format("%m"),
+            now.format("%d")
+        );
         match std::fs::create_dir_all(&archive_directory) {
-            Ok(_) =>  {
+            Ok(_) => {
                 let hour = now.format("%H");
                 let minute = now.format("%M");
                 let second = now.format("%S");
-                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.{}", archive_directory, &hour, &minute, &second, converted.filetype)) {
+                let mut buffer = match std::fs::File::create(format!(
+                    "{}/audio-{}-{}-{}.{}",
+                    archive_directory, &hour, &minute, &second, converted.filetype
+                )) {
                     Ok(b) => b,
                     Err(e) => {
                         // @TODO: deal with this gracefully
                         eprintln!("failed to create archive copy of audio file: {}", e);
                         return HttpResponse::InternalServerError()
                             .content_type("plain/text")
-                            .body(format!("failed to create archive copy of audio file: {}\n", e))
+                            .body(format!(
+                                "failed to create archive copy of audio file: {}\n",
+                                e
+                            ));
                     }
                 };
                 // Write audio.bytes into temporary file.
@@ -220,14 +247,20 @@ pub async fn _audio_to_text(
                     };
                     pos += bytes_written;
                 }
-                let mut buffer = match std::fs::File::create(format!("{}/audio-{}-{}-{}.txt", archive_directory, &hour, &minute, &second)) {
+                let mut buffer = match std::fs::File::create(format!(
+                    "{}/audio-{}-{}-{}.txt",
+                    archive_directory, &hour, &minute, &second
+                )) {
                     Ok(b) => b,
                     Err(e) => {
                         // @TODO: deal with this gracefully
-                        eprintln!("failed to create archive text conversion of audio file: {}", e);
+                        eprintln!(
+                            "failed to create archive text conversion of audio file: {}",
+                            e
+                        );
                         return HttpResponse::InternalServerError()
                             .content_type("plain/text")
-                            .body("error archiving text conversion of audio file\n".to_string())
+                            .body("error archiving text conversion of audio file\n".to_string());
                     }
                 };
                 match writeln!(buffer, "{}", &converted.raw) {
@@ -236,7 +269,10 @@ pub async fn _audio_to_text(
                 }
             }
             Err(e) => {
-                eprintln!("failed to create directory: '{}', {}", &archive_directory, e);
+                eprintln!(
+                    "failed to create directory: '{}', {}",
+                    &archive_directory, e
+                );
             }
         }
     }
