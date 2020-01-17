@@ -311,7 +311,7 @@ pub async fn _audio_to_text(
     }
 
     let parsed = nlu.engine.parse(&converted.raw, None, None).unwrap();
-    println!("NLU: {:?}", &parsed);
+    //println!("NLU: {:?}", &parsed);
 
     let _set_timer: String = "setTimer".to_string();
     let seconds;
@@ -332,8 +332,9 @@ pub async fn _audio_to_text(
 
     // Return text
     let kakaia_response = KakaiaResponse::new(command, Some(vec![seconds]), &human, &converted.raw);
-    println!("KakaiaResponse: {:?}", &kakaia_response);
-    return HttpResponse::InternalServerError()
+    // Debug output for now
+    println!("{:?}", &kakaia_response);
+    return HttpResponse::Ok()
         .content_type("application/json")
         .body(kakaia_response.to_json_string());
 }
