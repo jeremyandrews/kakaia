@@ -31,16 +31,16 @@ pub struct AudioAsText {
 #[derive(Debug, Serialize)]
 pub struct KakaiaResponse {
     command: String,
-    parameters: Option<Vec<i64>>,
+    parameter: i64,
     human: String,
     raw: String,
 }
 
 impl KakaiaResponse {
-    pub fn new(command: &str, parameter: Option<Vec<i64>>, human: &str, raw: &str) -> Self {
+    pub fn new(command: &str, parameter: i64, human: &str, raw: &str) -> Self {
         KakaiaResponse {
             command: command.to_string(),
-            parameters: parameter,
+            parameter: parameter,
             human: human.to_string(),
             raw: raw.to_string(),
         }
@@ -188,7 +188,7 @@ pub async fn _audio_to_text(
             // @TODO: logging, properly handle this error
             let error = format!("failed to decode audio.data: {}\n", e);
             eprint!("{}", &error);
-            let kakaia_response = KakaiaResponse::new("none", None, "unexpected error decoding audio data", &error);
+            let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error decoding audio data", &error);
             return HttpResponse::InternalServerError()
                 .content_type("application/json")
                 .body(kakaia_response.to_json_string());
@@ -200,7 +200,7 @@ pub async fn _audio_to_text(
         Ok(f) => f,
         Err(e) => {
             let error = format!("failed to create temporary file: {}", e);
-            let kakaia_response = KakaiaResponse::new("none", None, "unexpected error creating a temporary file", &error);
+            let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error creating a temporary file", &error);
             return HttpResponse::InternalServerError()
                 .content_type("application/json")
                 .body(kakaia_response.to_json_string());
@@ -212,7 +212,7 @@ pub async fn _audio_to_text(
         Ok(a) => a,
         Err(e) => {
             let error = format!("failed to open temporary file: {}", e);
-            let kakaia_response = KakaiaResponse::new("none", None, "unexpected error opening a temporary file", &error);
+            let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error opening a temporary file", &error);
             return HttpResponse::InternalServerError()
                 .content_type("application/json")
                 .body(kakaia_response.to_json_string());
@@ -226,7 +226,7 @@ pub async fn _audio_to_text(
             Ok(b) => b,
             Err(e) => {
                 let error = format!("failed to create temporary file: {}", e);
-                let kakaia_response = KakaiaResponse::new("none", None, "unexpected error creating a temporary file", &error);
+                let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error creating a temporary file", &error);
                 return HttpResponse::InternalServerError()
                     .content_type("application/json")
                     .body(kakaia_response.to_json_string());
@@ -260,7 +260,7 @@ pub async fn _audio_to_text(
                     Err(e) => {
                         // @TODO: deal with this gracefully
                         let error = format!("failed to create archive copy of audio file: {}", e);
-                        let kakaia_response = KakaiaResponse::new("none", None, "unexpected error archiving a copy of audio file", &error);
+                        let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error archiving a copy of audio file", &error);
                         return HttpResponse::InternalServerError()
                             .content_type("application/json")
                             .body(kakaia_response.to_json_string());
@@ -273,7 +273,7 @@ pub async fn _audio_to_text(
                         Ok(b) => b,
                         Err(e) => {
                             let error = format!("failed to write archive file: {}", e);
-                            let kakaia_response = KakaiaResponse::new("none", None, "unexpected error writing a copy of audio file", &error);
+                            let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error writing a copy of audio file", &error);
                             return HttpResponse::InternalServerError()
                                 .content_type("application/json")
                                 .body(kakaia_response.to_json_string());
@@ -289,7 +289,7 @@ pub async fn _audio_to_text(
                     Err(e) => {
                         // @TODO: deal with this gracefully
                         let error = format!("failed to create archive text conversion of audio file: {}", e);
-                        let kakaia_response = KakaiaResponse::new("none", None, "unexpected error writing text conversion of audio file", &error);
+                        let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error writing text conversion of audio file", &error);
                         return HttpResponse::InternalServerError()
                             .content_type("application/json")
                             .body(kakaia_response.to_json_string());
@@ -302,7 +302,7 @@ pub async fn _audio_to_text(
             }
             Err(e) => {
                 let error = format!("failed to create directory '{}': {}", &archive_directory, e);
-                let kakaia_response = KakaiaResponse::new("none", None, "unexpected error creating directory", &error);
+                let kakaia_response = KakaiaResponse::new("none", 0, "unexpected error creating directory", &error);
                 return HttpResponse::InternalServerError()
                     .content_type("application/json")
                     .body(kakaia_response.to_json_string());
@@ -331,7 +331,7 @@ pub async fn _audio_to_text(
     };
 
     // Return text
-    let kakaia_response = KakaiaResponse::new(command, Some(vec![seconds]), &human, &converted.raw);
+    let kakaia_response = KakaiaResponse::new(command, seconds, &human, &converted.raw);
     // Debug output for now
     println!("{:?}", &kakaia_response);
     return HttpResponse::Ok()
