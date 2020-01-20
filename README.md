@@ -94,10 +94,10 @@ Once the above is fully working, the next step will be to give Kakaia some very 
 
 Kakaia engine:
 
-- return text and metadata as JSON
-- match text against a single phrase: "set timer for n seconds/minutes/hours"
-- if successfully matched, return a machine-readable command to client
-- if not succesfully matched, return a machine-readable error
+- return text and metadata as JSON https://github.com/jeremyandrews/kakaia/issues/6
+- match text against a single phrase: "set timer for n seconds/minutes/hours" https://github.com/jeremyandrews/kakaia/issues/7
+- if successfully matched, return a machine-readable command to client https://github.com/jeremyandrews/kakaia/issues/8
+- if not succesfully matched, return a machine-readable error https://github.com/jeremyandrews/kakaia/issues/8
 
 Kakaia watchOS app:
 
@@ -109,15 +109,15 @@ Kakaia watchOS app:
 
 Functionality:
 
-- stream audio so conversion to text happens while user is speaking
-- push notifications from engine to client(s)
-- encrypt data sent between client(s) and engine so it can be securely sent across public networks
-- training: allow training of words/phrases, explore how to improve audio to text conversion (and to add support for unrecognized words, such as "kakaia")
-- add punctuation (either spoken words ie "comma", or automatically based on the metadata identifying pauses, etc)
+- stream audio so conversion to text happens while user is speaking https://github.com/jeremyandrews/kakaia/issues/9
+- push notifications from engine to client(s) https://github.com/jeremyandrews/kakaia/issues/14
+- encrypt data sent between client(s) and engine so it can be securely sent across public networks https://github.com/jeremyandrews/kakaia/issues/13
+- training: allow training of words/phrases, explore how to improve audio to text conversion (and to add support for unrecognized words, such as "kakaia") https://github.com/jeremyandrews/kakaia/issues/15
+- add punctuation (either spoken words ie "comma", or automatically based on the metadata identifying pauses, etc) https://github.com/jeremyandrews/kakaia/issues/16
 - attempt to recognize different speakers and optionally identify them in the text, or filter extraneous speakers
 - add additional commands:
-  - getting weather information
-  - controlling smart devices
+  - getting weather information https://github.com/jeremyandrews/kakaia/issues/10
+  - controlling smart devices https://github.com/jeremyandrews/kakaia/issues/11 https://github.com/jeremyandrews/kakaia/issues/12
   - setting reminders
   - creating/updating todo lists
   - dictating emails/notes
