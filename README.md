@@ -94,10 +94,10 @@ Once the above is fully working, the next step will be to give Kakaia some very 
 
 Kakaia engine:
 
-- return text and metadata as JSON https://github.com/jeremyandrews/kakaia/issues/6
-- match text against a single phrase: "set timer for n seconds/minutes/hours" https://github.com/jeremyandrews/kakaia/issues/7
-- if successfully matched, return a machine-readable command to client https://github.com/jeremyandrews/kakaia/issues/8
-- if not succesfully matched, return a machine-readable error https://github.com/jeremyandrews/kakaia/issues/8
+- return text and metadata as JSON [#6]
+- match text against a single phrase: "set timer for n seconds/minutes/hours" [#7] 
+- if successfully matched, return a machine-readable command to client [#8]
+- if not succesfully matched, return a machine-readable error [#8]
 
 Kakaia watchOS app:
 
