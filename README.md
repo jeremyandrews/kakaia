@@ -94,10 +94,10 @@ Once the above is fully working, the next step will be to give Kakaia some very 
 
 Kakaia engine:
 
-- return text and metadata as JSON [#6]
-- match text against a single phrase: "set timer for n seconds/minutes/hours" [#7] 
-- if successfully matched, return a machine-readable command to client [#8]
-- if not succesfully matched, return a machine-readable error [#8]
+- return text and metadata as JSON [#6](https://github.com/jeremyandrews/kakaia/issues/6)
+- match text against a single phrase: "set timer for n seconds/minutes/hours" [#7] (https://github.com/jeremyandrews/kakaia/issues/7)
+- if successfully matched, return a machine-readable command to client [#8](https://github.com/jeremyandrews/kakaia/issues/8)
+- if not succesfully matched, return a machine-readable error [#8](https://github.com/jeremyandrews/kakaia/issues/8)
 
 Kakaia watchOS app:
 
@@ -109,15 +109,15 @@ Kakaia watchOS app:
 
 Functionality:
 
-- stream audio so conversion to text happens while user is speaking https://github.com/jeremyandrews/kakaia/issues/9
-- push notifications from engine to client(s) https://github.com/jeremyandrews/kakaia/issues/14
-- encrypt data sent between client(s) and engine so it can be securely sent across public networks https://github.com/jeremyandrews/kakaia/issues/13
-- training: allow training of words/phrases, explore how to improve audio to text conversion (and to add support for unrecognized words, such as "kakaia") https://github.com/jeremyandrews/kakaia/issues/15
-- add punctuation (either spoken words ie "comma", or automatically based on the metadata identifying pauses, etc) https://github.com/jeremyandrews/kakaia/issues/16
+- stream audio so conversion to text happens while user is speaking [#9](https://github.com/jeremyandrews/kakaia/issues/9)
+- push notifications from engine to client(s) [#14](https://github.com/jeremyandrews/kakaia/issues/14)
+- encrypt data sent between client(s) and engine so it can be securely sent across public networks [#13](https://github.com/jeremyandrews/kakaia/issues/13)
+- training: allow training of words/phrases, explore how to improve audio to text conversion (and to add support for unrecognized words, such as "kakaia") [#15](https://github.com/jeremyandrews/kakaia/issues/15)
+- add punctuation (either spoken words ie "comma", or automatically based on the metadata identifying pauses, etc) [#16](https://github.com/jeremyandrews/kakaia/issues/16)
 - attempt to recognize different speakers and optionally identify them in the text, or filter extraneous speakers
 - add additional commands:
-  - getting weather information https://github.com/jeremyandrews/kakaia/issues/10
-  - controlling smart devices https://github.com/jeremyandrews/kakaia/issues/11 https://github.com/jeremyandrews/kakaia/issues/12
+  - getting weather information [#10](https://github.com/jeremyandrews/kakaia/issues/10)
+  - controlling smart devices [#11](https://github.com/jeremyandrews/kakaia/issues/11) [#12](https://github.com/jeremyandrews/kakaia/issues/12)
   - setting reminders
   - creating/updating todo lists
   - dictating emails/notes
