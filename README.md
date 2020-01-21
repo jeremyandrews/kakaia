@@ -25,25 +25,25 @@ Build Kakaia as follows:
 
 Run the Kakaia engine using all defaults as follows:
 
-    ./targets/release/kakaia
+    cargo run --release
 
 Learn about available options by passing in the `-h` parameter.
 
-    ./targets/release/kakaia -h
+    cargo run --release -- -h
 
 For example, to save a copy of all audio files and text conversions, pass in the `-s` parameter:
 
-    ./targets/release/kakaia -s
+    cargo run --release -- -s
 
 Or, to listen on a different port, you could pass in the following:
 
-    ./targets/release/kakaia -s --listen 0.0.0.0:8089
+    cargo run --release -- -s --listen 0.0.0.0:8089
 
 You can use `curl` to test the Kakaia engine without a client as follows:
 
 ```
-curl --request POST --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
-test
+curl --data @test/test.base64 http://127.0.0.1:8088/convert/audio/text
+{"command":"none","parameter":0,"human":"none","raw":"test"}
 ```
 
 ### Kakaia client
