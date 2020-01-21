@@ -7,6 +7,19 @@
     {
       "entity_scope": {
         "builtin": [
+          "snips/temperature"
+        ],
+        "custom": [
+          "temperature_name"
+        ]
+      },
+      "intent_group": [
+        "convertTemperature"
+      ]
+    },
+    {
+      "entity_scope": {
+        "builtin": [
           "snips/duration"
         ],
         "custom": []
@@ -17,42 +30,59 @@
     }
   ],
   "intents_names": [
+    "convertTemperature",
     "setTimer"
   ],
   "language_code": "en",
   "map": {
-    "542811207": [
+    "-1639019789": [
       0,
       [
-        0
+        0,
+        1
+      ]
+    ],
+    "-425750413": [
+      0,
+      [
+        0,
+        1
+      ]
+    ],
+    "542811207": [
+      1,
+      [
+        2
       ]
     ],
     "615069775": [
-      0,
+      1,
       [
-        0
+        2
       ]
     ],
     "1067490550": [
-      0,
+      1,
       [
-        0
+        2
       ]
     ],
     "1263780835": [
-      0,
+      1,
       [
-        0
+        2
       ]
     ],
     "1996537062": [
-      0,
+      1,
       [
-        0
+        2
       ]
     ]
   },
   "slots_names": [
+    "temperature",
+    "temperature_name",
     "duration"
   ],
   "stop_words_whitelist": {}

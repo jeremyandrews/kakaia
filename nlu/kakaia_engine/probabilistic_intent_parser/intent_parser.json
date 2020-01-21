@@ -186,8 +186,12 @@
   },
   "slot_fillers": [
     {
-      "intent": "setTimer",
+      "intent": "convertTemperature",
       "slot_filler_name": "slot_filler_0"
+    },
+    {
+      "intent": "setTimer",
+      "slot_filler_name": "slot_filler_1"
     }
   ]
 }

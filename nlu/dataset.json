@@ -1,8 +1,135 @@
 {
   "entities": {
-    "snips/duration": {}
+    "snips/duration": {},
+    "snips/temperature": {},
+    "temperature_name": {
+      "automatically_extensible": false,
+      "data": [
+        {
+          "synonyms": [],
+          "value": "(celsius, degrees celcius, C, degrees C)"
+        },
+        {
+          "synonyms": [],
+          "value": "(fahrenheit, degrees fahrenheit, F, degrees F)"
+        },
+        {
+          "synonyms": [],
+          "value": "(kelvin, degrees kelvin, K, degree K)"
+        }
+      ],
+      "matching_strictness": 1.0,
+      "use_synonyms": true
+    }
   },
   "intents": {
+    "convertTemperature": {
+      "utterances": [
+        {
+          "data": [
+            {
+              "text": "Convert "
+            },
+            {
+              "entity": "snips/temperature",
+              "slot_name": "temperature",
+              "text": "five degrees celcius"
+            },
+            {
+              "text": " to "
+            },
+            {
+              "entity": "temperature_name",
+              "slot_name": "temperature_name",
+              "text": "fahrenheit"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Please convert "
+            },
+            {
+              "entity": "snips/temperature",
+              "slot_name": "temperature",
+              "text": "thirty two degrees fahrenheit"
+            },
+            {
+              "text": " to "
+            },
+            {
+              "entity": "temperature_name",
+              "slot_name": "temperature_name",
+              "text": "celcius"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Convert from "
+            },
+            {
+              "entity": "snips/temperature",
+              "slot_name": "temperature",
+              "text": "one hundred degrees celcius"
+            },
+            {
+              "text": " to "
+            },
+            {
+              "entity": "temperature_name",
+              "slot_name": "temperature_name",
+              "text": "degrees kelvin"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Can you convert from "
+            },
+            {
+              "entity": "snips/temperature",
+              "slot_name": "temperature",
+              "text": "ninety eight degrees fahrenheit"
+            },
+            {
+              "text": " to "
+            },
+            {
+              "entity": "temperature_name",
+              "slot_name": "temperature_name",
+              "text": "degrees C"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Convert "
+            },
+            {
+              "entity": "snips/temperature",
+              "slot_name": "temperature",
+              "text": "two hundred degress kelvin"
+            },
+            {
+              "text": " to "
+            },
+            {
+              "entity": "temperature_name",
+              "slot_name": "temperature_name",
+              "text": "fahrenheit"
+            },
+            {
+              "text": " please"
+            }
+          ]
+        }
+      ]
+    },
     "setTimer": {
       "utterances": [
         {

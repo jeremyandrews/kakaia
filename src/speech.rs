@@ -311,7 +311,7 @@ pub async fn _audio_to_text(
     }
 
     let parsed = nlu.engine.parse(&converted.raw, None, None).unwrap();
-    //println!("NLU: {:?}", &parsed);
+    println!("NLU: {:?}", &parsed);
 
     let _set_timer: String = "setTimer".to_string();
     let seconds;
@@ -322,10 +322,10 @@ pub async fn _audio_to_text(
             command = "none";
             "none".to_string()
         }
-        Some(_set_timer) => {
+        Some(cmd) => {
             let json_result = serde_json::to_value(&parsed).unwrap();
             seconds = nlu.duration_as_seconds(&json_result["slots"][0]["value"]);
-            command = "setTimer";
+            command = cmd;
             format!("set timer for {} seconds", seconds)
         }
     };

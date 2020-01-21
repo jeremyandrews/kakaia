@@ -100,9 +100,7 @@
       },
       {
         "args": {
-          "entities": [
-            "temperature_name"
-          ],
+          "entities": [],
           "entity_filter": {
             "automatically_extensible": false
           },
@@ -176,10 +174,9 @@
     "unit_name": "crf_slot_filler"
   },
   "crf_model_file": "model.crfsuite",
-  "intent": "convertTemperature",
+  "intent": "setTimer",
   "language_code": "en",
   "slot_name_mapping": {
-    "temperature": "snips/temperature",
-    "temperature_name": "temperature_name"
+    "duration": "snips/duration"
   }
 }

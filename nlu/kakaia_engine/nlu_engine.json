@@ -196,9 +196,17 @@
   },
   "custom_entity_parser": "custom_entity_parser",
   "dataset_metadata": {
-    "entities": {},
+    "entities": {
+      "temperature_name": {
+        "automatically_extensible": false
+      }
+    },
     "language_code": "en",
     "slot_name_mappings": {
+      "convertTemperature": {
+        "temperature": "snips/temperature",
+        "temperature_name": "temperature_name"
+      },
       "setTimer": {
         "duration": "snips/duration"
       }

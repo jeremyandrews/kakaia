@@ -3,11 +3,37 @@
 type: intent
 name: setTimer
 slots: 
- - name: duration
-   entity: snips/duration
+  - name: duration
+    entity: snips/duration
 utterances: 
- - Set the timer [duration](for five minutes)
- - Please set a [duration](three hour) timer
- - Sta`rt a timer of [duration](half an hour)
- - Can you start a timer [duration](for eight minutes)
- - Initiate a timer [duration](for thirteen minutes)
+  - Set the timer [duration](for five minutes)
+  - Please set a [duration](three hour) timer
+  - Start a timer of [duration](half an hour)
+  - Can you start a timer [duration](for eight minutes)
+  - Initiate a timer [duration](for thirteen minutes)
+
+# convertTemperature intent
+---
+type: intent
+name: convertTemperature
+slots:
+  - name: temperature
+    entity: snips/temperature
+  - name: temperature_name
+    entity: temperature_name
+utterances:
+  - Convert [temperature](five degrees celcius) to [temperature_name](fahrenheit)
+  - Please convert [temperature](thirty two degrees fahrenheit) to [temperature_name](celcius)
+  - Convert from [temperature](one hundred degrees celcius) to [temperature_name](degrees kelvin)
+  - Can you convert from [temperature](ninety eight degrees fahrenheit) to [temperature_name](degrees C)
+  - Convert [temperature](two hundred degress kelvin) to [temperature_name](fahrenheit) please
+
+# temperature_name entity
+---
+type: entity
+name: temperature_name
+automatically_extensible: no
+values:
+- (celsius, degrees celcius, C, degrees C)
+- (fahrenheit, degrees fahrenheit, F, degrees F)
+- (kelvin, degrees kelvin, K, degree K)

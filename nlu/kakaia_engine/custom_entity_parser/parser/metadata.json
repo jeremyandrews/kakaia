@@ -1,3 +1,8 @@
 {
-  "parsers_metadata": []
+  "parsers_metadata": [
+    {
+      "entity_identifier": "temperature_name",
+      "entity_parser": "parser_1"
+    }
+  ]
 }
