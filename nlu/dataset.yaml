@@ -1,3 +1,17 @@
+# Per https://snips-nlu.readthedocs.io/en/latest/cli.html#creating-a-dataset
+#
+# Produce a dataset:
+#   snips-nlu generate-dataset en dataset.yaml > dataset.json
+#
+# Train the NLU engine:
+#   snips-nlu train dataset.json kakaia_engine/
+#
+# And then test:
+# snips-nlu parse kakaia_engine/
+#
+# Built in entity types are documented at:
+# https://snips-nlu.readthedocs.io/en/latest/builtin_entities.html#builtin-entities
+
 # setTimer intent
 ---
 type: intent
@@ -34,6 +48,41 @@ type: entity
 name: temperature_name
 automatically_extensible: no
 values:
-- (celsius, degrees celcius, C, degrees C)
-- (fahrenheit, degrees fahrenheit, F, degrees F)
-- (kelvin, degrees kelvin, K, degree K)
+  - [celsius, degrees celcius, C, degrees C]
+  - [fahrenheit, degrees fahrenheit, F, degrees F]
+  - [kelvin, degrees kelvin, K, degree K]
+
+# doMath intent
+---
+type: intent
+name: doMath
+slots:
+  - name: number
+    entity: snips/number
+  - name: operation
+    entity: operation
+utterances:
+  - What is [number](ten) [operation](times) [number](five)
+  - How much is [number](three) [operation](minus) [number](two)
+  - Find [number](six) [operation](plus) [number](four)
+  - Answer me [number](five) [operation](added to) [number](ten)
+  - Tell me how much is [number](eight) [operation](divided by) [number](four)
+  - Please [operation](subtract) [number](three) from [number](eight)
+  - Get [operation](add) [number](eight) and [number](twelve)
+  - Can you tell me [number](ten) [match_operation](split by) [number](five)
+  - Total [number](one) [operation](and) [number](one)
+  - Combine [number](five) [operation](and) [number](fifteen)
+  - What is [number](eight) [operation](less) [number](ten)
+  - Calculate [number](one hundred) [operation](multiplied by) [number](eight)
+  - How much is [number](eight hundred) [operation](divide) [number](eight)
+
+# temperature_name entity
+---
+type: entity
+name: operation
+automatically_extensible: no
+values:
+  - [plus, and, added to]
+  - [minus, less, subtract]
+  - [times, multiplied by]
+  - [divide, divided by, split by]

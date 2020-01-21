@@ -197,6 +197,12 @@
   "custom_entity_parser": "custom_entity_parser",
   "dataset_metadata": {
     "entities": {
+      "match_operation": {
+        "automatically_extensible": true
+      },
+      "operation": {
+        "automatically_extensible": false
+      },
       "temperature_name": {
         "automatically_extensible": false
       }
@@ -206,6 +212,11 @@
       "convertTemperature": {
         "temperature": "snips/temperature",
         "temperature_name": "temperature_name"
+      },
+      "doMath": {
+        "match_operation": "match_operation",
+        "number": "snips/number",
+        "operation": "operation"
       },
       "setTimer": {
         "duration": "snips/duration"

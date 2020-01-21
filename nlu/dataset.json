@@ -1,21 +1,74 @@
 {
   "entities": {
+    "match_operation": {
+      "automatically_extensible": true,
+      "data": [],
+      "matching_strictness": 1.0,
+      "use_synonyms": true
+    },
+    "operation": {
+      "automatically_extensible": false,
+      "data": [
+        {
+          "synonyms": [
+            "and",
+            "added to"
+          ],
+          "value": "plus"
+        },
+        {
+          "synonyms": [
+            "less",
+            "subtract"
+          ],
+          "value": "minus"
+        },
+        {
+          "synonyms": [
+            "multiplied by"
+          ],
+          "value": "times"
+        },
+        {
+          "synonyms": [
+            "divided by",
+            "split by"
+          ],
+          "value": "divide"
+        }
+      ],
+      "matching_strictness": 1.0,
+      "use_synonyms": true
+    },
     "snips/duration": {},
+    "snips/number": {},
     "snips/temperature": {},
     "temperature_name": {
       "automatically_extensible": false,
       "data": [
         {
-          "synonyms": [],
-          "value": "(celsius, degrees celcius, C, degrees C)"
+          "synonyms": [
+            "degrees celcius",
+            "C",
+            "degrees C"
+          ],
+          "value": "celsius"
         },
         {
-          "synonyms": [],
-          "value": "(fahrenheit, degrees fahrenheit, F, degrees F)"
+          "synonyms": [
+            "degrees fahrenheit",
+            "F",
+            "degrees F"
+          ],
+          "value": "fahrenheit"
         },
         {
-          "synonyms": [],
-          "value": "(kelvin, degrees kelvin, K, degree K)"
+          "synonyms": [
+            "degrees kelvin",
+            "K",
+            "degree K"
+          ],
+          "value": "kelvin"
         }
       ],
       "matching_strictness": 1.0,
@@ -125,6 +178,374 @@
             },
             {
               "text": " please"
+            }
+          ]
+        }
+      ]
+    },
+    "doMath": {
+      "utterances": [
+        {
+          "data": [
+            {
+              "text": "What is "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "ten"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "times"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "five"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "How much is "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "three"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "minus"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "two"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Find "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "six"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "plus"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "four"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Answer me "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "five"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "added to"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "ten"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Tell me how much is "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "eight"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "divided by"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "four"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Please "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "subtract"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "three"
+            },
+            {
+              "text": " from "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "eight"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Get "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "add"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "eight"
+            },
+            {
+              "text": " and "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "twelve"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Can you tell me "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "ten"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "match_operation",
+              "slot_name": "match_operation",
+              "text": "split by"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "five"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Total "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "one"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "and"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "one"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Combine "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "five"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "and"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "fifteen"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "What is "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "eight"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "less"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "ten"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "Calculate "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "one hundred"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "multiplied by"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "eight"
+            }
+          ]
+        },
+        {
+          "data": [
+            {
+              "text": "How much is "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "eight hundred"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "operation",
+              "slot_name": "operation",
+              "text": "divide"
+            },
+            {
+              "text": " "
+            },
+            {
+              "entity": "snips/number",
+              "slot_name": "number",
+              "text": "eight"
             }
           ]
         }
