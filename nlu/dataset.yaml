@@ -1,0 +1,13 @@
+# setTimer intent
+---
+type: intent
+name: setTimer
+slots: 
+ - name: duration
+   entity: snips/duration
+utterances: 
+ - Set the timer [duration](for five minutes)
+ - Please set a [duration](three hour) timer
+ - Sta`rt a timer of [duration](half an hour)
+ - Can you start a timer [duration](for eight minutes)
+ - Initiate a timer [duration](for thirteen minutes)
