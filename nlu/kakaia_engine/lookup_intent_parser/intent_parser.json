@@ -20,6 +20,17 @@
     {
       "entity_scope": {
         "builtin": [
+          "snips/duration"
+        ],
+        "custom": []
+      },
+      "intent_group": [
+        "setTimer"
+      ]
+    },
+    {
+      "entity_scope": {
+        "builtin": [
           "snips/number"
         ],
         "custom": [
@@ -28,42 +39,31 @@
         ]
       },
       "intent_group": [
-        "doMath"
-      ]
-    },
-    {
-      "entity_scope": {
-        "builtin": [
-          "snips/duration"
-        ],
-        "custom": []
-      },
-      "intent_group": [
-        "setTimer"
+        "simpleCalculation"
       ]
     }
   ],
   "intents_names": [
     "convertTemperature",
-    "doMath",
-    "setTimer"
+    "setTimer",
+    "simpleCalculation"
   ],
   "language_code": "en",
   "map": {
     "-1973933113": [
-      1,
+      2,
       [
-        3,
-        2,
-        2
+        4,
+        5,
+        3
       ]
     ],
     "-1654533686": [
-      1,
+      2,
       [
-        3,
-        2,
-        2
+        4,
+        5,
+        3
       ]
     ],
     "-1639019789": [
@@ -74,27 +74,27 @@
       ]
     ],
     "-1053019393": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "-786630319": [
-      1,
+      2,
       [
-        2,
-        4,
-        2
+        3,
+        6,
+        5
       ]
     ],
     "-462097752": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "-425750413": [
@@ -105,94 +105,95 @@
       ]
     ],
     "802678": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "130595279": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "542811207": [
-      2,
+      1,
       [
-        5
+        2
       ]
     ],
     "615069775": [
-      2,
+      1,
       [
-        5
+        2
       ]
     ],
     "812241522": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "1067490550": [
-      2,
+      1,
       [
-        5
+        2
       ]
     ],
     "1263780835": [
-      2,
+      1,
       [
-        5
+        2
       ]
     ],
     "1278822423": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "1439433186": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "1541441544": [
-      1,
+      2,
       [
-        2,
         3,
-        2
+        4,
+        5
       ]
     ],
     "1996537062": [
-      2,
+      1,
       [
-        5
+        2
       ]
     ]
   },
   "slots_names": [
-    "temperature",
-    "temperature_name",
-    "number",
+    "from",
+    "to",
+    "duration",
+    "first",
     "operation",
-    "match_operation",
-    "duration"
+    "second",
+    "match_operation"
   ],
   "stop_words_whitelist": {
-    "doMath": [
+    "simpleCalculation": [
       "and"
     ]
   }

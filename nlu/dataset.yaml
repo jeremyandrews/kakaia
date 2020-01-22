@@ -36,11 +36,11 @@ slots:
   - name: temperature_name
     entity: temperature_name
 utterances:
-  - Convert [temperature](five degrees celcius) to [temperature_name](fahrenheit)
-  - Please convert [temperature](thirty two degrees fahrenheit) to [temperature_name](celcius)
-  - Convert from [temperature](one hundred degrees celcius) to [temperature_name](degrees kelvin)
-  - Can you convert from [temperature](ninety eight degrees fahrenheit) to [temperature_name](degrees C)
-  - Convert [temperature](two hundred degress kelvin) to [temperature_name](fahrenheit) please
+  - Convert [from:snips/temperature](five degrees celcius) to [to:temperature_name](fahrenheit)
+  - Please convert [from:snips/temperature](thirty two degrees fahrenheit) to [to:temperature_name](celcius)
+  - Convert from [from:snips/temperature](one hundred degrees celcius) to [to:temperature_name](degrees kelvin)
+  - Can you convert from [from:snips/temperature](ninety eight degrees fahrenheit) to [to:temperature_name](degrees C)
+  - Convert [from:snips/temperature](two hundred degress kelvin) to [to:temperature_name](fahrenheit) please
 
 # temperature_name entity
 ---
@@ -52,29 +52,30 @@ values:
   - [fahrenheit, degrees fahrenheit, F, degrees F]
   - [kelvin, degrees kelvin, K, degree K]
 
-# doMath intent
+# simpleCalculation intent
 ---
 type: intent
-name: doMath
+name: simpleCalculation
+automatically_extensible: true
 slots:
   - name: number
     entity: snips/number
   - name: operation
     entity: operation
 utterances:
-  - What is [number](ten) [operation](times) [number](five)
-  - How much is [number](three) [operation](minus) [number](two)
-  - Find [number](six) [operation](plus) [number](four)
-  - Answer me [number](five) [operation](added to) [number](ten)
-  - Tell me how much is [number](eight) [operation](divided by) [number](four)
-  - Please [operation](subtract) [number](three) from [number](eight)
-  - Get [operation](add) [number](eight) and [number](twelve)
-  - Can you tell me [number](ten) [match_operation](split by) [number](five)
-  - Total [number](one) [operation](and) [number](one)
-  - Combine [number](five) [operation](and) [number](fifteen)
-  - What is [number](eight) [operation](less) [number](ten)
-  - Calculate [number](one hundred) [operation](multiplied by) [number](eight)
-  - How much is [number](eight hundred) [operation](divide) [number](eight)
+  - What is [first:snips/number](ten) [operation](times) [second:snips/number](five)
+  - How much is [first:snips/number](three) [operation](minus) [second:snips/number](two)
+  - Find [first:snips/number](six) [operation](plus) [second:snips/number](four)
+  - Answer me [first:snips/number](five) [operation](added to) [second:snips/number](ten)
+  - Tell me how much is [first:snips/number](eight) [operation](divided by) [second:snips/number](four)
+  - Please [operation](subtract) [second:snips/number](three) from [first:snips/number](eight)
+  - Get [operation](add) [second:snips/number](eight) and [first:snips/number](twelve)
+  - Can you tell me [first:snips/number](ten) [match_operation](split by) [second:snips/number](five)
+  - Total [first:snips/number](one) [operation](and) [second:snips/number](one)
+  - Combine [first:snips/number](five) [operation](and) [second:snips/number](fifteen)
+  - What is [first:snips/number](eight) [operation](less) [second:snips/number](ten)
+  - Calculate [first:snips/number](one hundred) [operation](multiplied by) [second:snips/number](eight)
+  - How much is [first:snips/number](eight hundred) [operation](divide) [second:snips/number](eight)
 
 # temperature_name entity
 ---
@@ -84,5 +85,5 @@ automatically_extensible: no
 values:
   - [plus, and, added to]
   - [minus, less, subtract]
-  - [times, multiplied by]
+  - [multiply, times, multiplied by]
   - [divide, divided by, split by]

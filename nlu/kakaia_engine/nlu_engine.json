@@ -210,16 +210,17 @@
     "language_code": "en",
     "slot_name_mappings": {
       "convertTemperature": {
-        "temperature": "snips/temperature",
-        "temperature_name": "temperature_name"
-      },
-      "doMath": {
-        "match_operation": "match_operation",
-        "number": "snips/number",
-        "operation": "operation"
+        "from": "snips/temperature",
+        "to": "temperature_name"
       },
       "setTimer": {
         "duration": "snips/duration"
+      },
+      "simpleCalculation": {
+        "first": "snips/number",
+        "match_operation": "match_operation",
+        "operation": "operation",
+        "second": "snips/number"
       }
     }
   },

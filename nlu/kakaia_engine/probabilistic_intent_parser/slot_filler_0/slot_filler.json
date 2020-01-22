@@ -179,7 +179,7 @@
   "intent": "convertTemperature",
   "language_code": "en",
   "slot_name_mapping": {
-    "temperature": "snips/temperature",
-    "temperature_name": "temperature_name"
+    "from": "snips/temperature",
+    "to": "temperature_name"
   }
 }

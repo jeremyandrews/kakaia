@@ -100,7 +100,9 @@
       },
       {
         "args": {
-          "entities": [],
+          "entities": [
+            "operation"
+          ],
           "entity_filter": {
             "automatically_extensible": false
           },
@@ -116,7 +118,9 @@
       },
       {
         "args": {
-          "entities": [],
+          "entities": [
+            "match_operation"
+          ],
           "entity_filter": {
             "automatically_extensible": true
           },
@@ -174,9 +178,12 @@
     "unit_name": "crf_slot_filler"
   },
   "crf_model_file": "model.crfsuite",
-  "intent": "setTimer",
+  "intent": "simpleCalculation",
   "language_code": "en",
   "slot_name_mapping": {
-    "duration": "snips/duration"
+    "first": "snips/number",
+    "match_operation": "match_operation",
+    "operation": "operation",
+    "second": "snips/number"
   }
 }

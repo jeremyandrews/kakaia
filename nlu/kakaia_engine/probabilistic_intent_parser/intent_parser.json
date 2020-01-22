@@ -190,11 +190,11 @@
       "slot_filler_name": "slot_filler_0"
     },
     {
-      "intent": "doMath",
+      "intent": "setTimer",
       "slot_filler_name": "slot_filler_1"
     },
     {
-      "intent": "setTimer",
+      "intent": "simpleCalculation",
       "slot_filler_name": "slot_filler_2"
     }
   ]

@@ -1,4 +1,5 @@
 use snips_nlu_lib::SnipsNluEngine;
+use serde_json::value::{Value, Map};
 
 pub struct NLU {
     pub engine: SnipsNluEngine,
@@ -18,7 +19,78 @@ impl NLU {
         }
     }
 
-    pub fn duration_as_seconds(&self, timer_values: &serde_json::Value) -> i64 {
+    // Parse string with NLU engine and return as json value
+    pub fn parse(&self, text: &str) -> Value {
+        // @TODO: error handling
+        let parsed = self.engine.parse(text, None, None).unwrap();
+        serde_json::to_value(&parsed).unwrap()
+    }
+
+    // Get command String
+    pub fn get_command(&self, parsed_json: &Value) -> String {
+        let intent = match &parsed_json["intent"].as_object() {
+            Some(i) => i.clone(),
+            None => return "none".to_string(),
+        };
+        match intent["intentName"].as_str() {
+            Some(i) => i.to_string(),
+            None => "none".to_string(),
+        }
+    }
+
+    // Confirm the response has the expected number of slots
+    pub fn has_expected_slots(&self, parsed_json: &Value, count: usize) -> bool {
+        let slots = match parsed_json["slots"].as_array() {
+            Some(s) => s,
+            None => return false
+        };
+        slots.len() == count
+    }
+
+    // Get the value of a specific slot
+    pub fn get_slot_value<'a>(&self, parsed_json: &'a Value, entity: &str, slot_name: &str) -> Option<&'a Map<String, Value>> {
+        let slots = match parsed_json["slots"].as_array() {
+            Some(s) => s,
+            None => return None
+        };
+        for slot in slots {
+            match slot.as_object() {
+                Some(slot) => {
+                    if slot["entity"] == entity && slot["slotName"] == slot_name {
+                        return slot["value"].as_object()
+                    }
+                },
+                None => (),
+            }
+        }
+        None
+    }
+
+    pub fn get_float(&self, value: Option<&Map<String, Value>>) -> f64 {
+        match value {
+            Some(v) => {
+                match v["value"].as_f64() {
+                    Some(n) => n,
+                    None => 0.0,
+                }
+            },
+            None => 0.0,
+        }
+    }
+
+    pub fn get_string(&self, value: Option<&Map<String, Value>>) -> String {
+        match value {
+            Some(v) => {
+                match v["value"].as_str() {
+                    Some(n) => n.to_string(),
+                    None => "".to_string(),
+                }
+            },
+            None => "".to_string(),
+        }
+    }
+
+    pub fn duration_as_seconds(&self, timer_values: &Map<String, Value>) -> i64 {
         let seconds: i64;
         if timer_values["seconds"].is_i64() {
             seconds = match serde_json::from_value(timer_values["seconds"].clone()) {
