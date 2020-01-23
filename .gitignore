@@ -2,3 +2,5 @@
 **/*.rs.bk
 archive/*
 models/*
+*.base64
+*.wav

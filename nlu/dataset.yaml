@@ -1,0 +1,89 @@
+# Per https://snips-nlu.readthedocs.io/en/latest/cli.html#creating-a-dataset
+#
+# Produce a dataset:
+#   snips-nlu generate-dataset en dataset.yaml > dataset.json
+#
+# Train the NLU engine:
+#   snips-nlu train dataset.json kakaia_engine/
+#
+# And then test:
+# snips-nlu parse kakaia_engine/
+#
+# Built in entity types are documented at:
+# https://snips-nlu.readthedocs.io/en/latest/builtin_entities.html#builtin-entities
+
+# setTimer intent
+---
+type: intent
+name: setTimer
+slots: 
+  - name: duration
+    entity: snips/duration
+utterances: 
+  - Set the timer [duration](for five minutes)
+  - Please set a [duration](three hour) timer
+  - Start a timer of [duration](half an hour)
+  - Can you start a timer [duration](for eight minutes)
+  - Initiate a timer [duration](for thirteen minutes)
+
+# convertTemperature intent
+---
+type: intent
+name: convertTemperature
+slots:
+  - name: temperature
+    entity: snips/temperature
+  - name: temperature_name
+    entity: temperature_name
+utterances:
+  - Convert [from:snips/temperature](five degrees celcius) to [to:temperature_name](fahrenheit)
+  - Please convert [from:snips/temperature](thirty two degrees fahrenheit) to [to:temperature_name](celcius)
+  - Convert from [from:snips/temperature](one hundred degrees celcius) to [to:temperature_name](degrees kelvin)
+  - Can you convert from [from:snips/temperature](ninety eight degrees fahrenheit) to [to:temperature_name](degrees C)
+  - Convert [from:snips/temperature](two hundred degrees kelvin) to [to:temperature_name](fahrenheit) please
+
+# temperature_name entity
+---
+type: entity
+name: temperature_name
+automatically_extensible: no
+values:
+  - [celsius, degrees celsius, C, degrees C, selsus, salius]
+  - [fahrenheit, degrees fahrenheit, F, degrees F, farnie, ferent]
+  - [kelvin, degrees kelvin, K, degrees K, calvin]
+
+# simpleCalculation intent
+---
+type: intent
+name: simpleCalculation
+automatically_extensible: true
+slots:
+  - name: number
+    entity: snips/number
+  - name: operation
+    entity: operation
+utterances:
+  - What is [first:snips/number](ten) [operation](times) [second:snips/number](five)
+  - How much is [first:snips/number](three) [operation](minus) [second:snips/number](two)
+  - Find [first:snips/number](six) [operation](plus) [second:snips/number](four)
+  - Answer me [first:snips/number](five) [operation](added to) [second:snips/number](ten)
+  - Tell me how much is [first:snips/number](eight) [operation](divided by) [second:snips/number](four)
+  - Please [operation](subtract) [second:snips/number](three) from [first:snips/number](eight)
+  - Get [operation](add) [second:snips/number](eight) and [first:snips/number](twelve)
+  - Can you tell me [first:snips/number](ten) [match_operation](split by) [second:snips/number](five)
+  - Total [first:snips/number](one) [operation](and) [second:snips/number](one)
+  - Combine [first:snips/number](five) [operation](and) [second:snips/number](fifteen)
+  - What is [first:snips/number](eight) [operation](less) [second:snips/number](ten)
+  - Calculate [first:snips/number](one hundred) [operation](multiplied by) [second:snips/number](eight)
+  - How much is [first:snips/number](eight hundred) [operation](divide) [second:snips/number](eight)
+
+# temperature_name entity
+---
+type: entity
+name: operation
+automatically_extensible: no
+values:
+  - [plus, and, added to]
+  - [minus, less, subtract]
+  - [multiply, times, multiplied by]
+  - [divide, divided by, split by]

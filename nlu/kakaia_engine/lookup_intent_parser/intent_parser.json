@@ -1,0 +1,200 @@
+{
+  "config": {
+    "ignore_stop_words": true,
+    "unit_name": "lookup_intent_parser"
+  },
+  "entity_scopes": [
+    {
+      "entity_scope": {
+        "builtin": [
+          "snips/temperature"
+        ],
+        "custom": [
+          "temperature_name"
+        ]
+      },
+      "intent_group": [
+        "convertTemperature"
+      ]
+    },
+    {
+      "entity_scope": {
+        "builtin": [
+          "snips/duration"
+        ],
+        "custom": []
+      },
+      "intent_group": [
+        "setTimer"
+      ]
+    },
+    {
+      "entity_scope": {
+        "builtin": [
+          "snips/number"
+        ],
+        "custom": [
+          "operation",
+          "match_operation"
+        ]
+      },
+      "intent_group": [
+        "simpleCalculation"
+      ]
+    }
+  ],
+  "intents_names": [
+    "convertTemperature",
+    "setTimer",
+    "simpleCalculation"
+  ],
+  "language_code": "en",
+  "map": {
+    "-1973933113": [
+      2,
+      [
+        4,
+        5,
+        3
+      ]
+    ],
+    "-1654533686": [
+      2,
+      [
+        4,
+        5,
+        3
+      ]
+    ],
+    "-1639019789": [
+      0,
+      [
+        0,
+        1
+      ]
+    ],
+    "-1053019393": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "-786630319": [
+      2,
+      [
+        3,
+        6,
+        5
+      ]
+    ],
+    "-462097752": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "-425750413": [
+      0,
+      [
+        0,
+        1
+      ]
+    ],
+    "802678": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "130595279": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "542811207": [
+      1,
+      [
+        2
+      ]
+    ],
+    "615069775": [
+      1,
+      [
+        2
+      ]
+    ],
+    "812241522": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "1067490550": [
+      1,
+      [
+        2
+      ]
+    ],
+    "1263780835": [
+      1,
+      [
+        2
+      ]
+    ],
+    "1278822423": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "1439433186": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "1541441544": [
+      2,
+      [
+        3,
+        4,
+        5
+      ]
+    ],
+    "1996537062": [
+      1,
+      [
+        2
+      ]
+    ]
+  },
+  "slots_names": [
+    "from",
+    "to",
+    "duration",
+    "first",
+    "operation",
+    "second",
+    "match_operation"
+  ],
+  "stop_words_whitelist": {
+    "simpleCalculation": [
+      "and"
+    ]
+  }
+}

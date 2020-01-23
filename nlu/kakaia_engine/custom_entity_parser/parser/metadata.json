@@ -1,0 +1,16 @@
+{
+  "parsers_metadata": [
+    {
+      "entity_identifier": "match_operation",
+      "entity_parser": "parser_1"
+    },
+    {
+      "entity_identifier": "operation",
+      "entity_parser": "parser_2"
+    },
+    {
+      "entity_identifier": "temperature_name",
+      "entity_parser": "parser_3"
+    }
+  ]
+}
