@@ -387,16 +387,67 @@ pub async fn _audio_to_text(
         }
         // convertTemperature command, return converted temperature
         KakaiaCommandType::ConvertTemperature => {
-            println!("ConvertTemperature: {:?}", parsed_json);
+            //println!("ConvertTemperature: {:?}", parsed_json);
             if nlu.has_expected_slots(&parsed_json, 2) {
                 let from_value = nlu.get_slot_value(&parsed_json, "snips/temperature", "from");
+                let from_degrees = nlu.get_float(from_value);
+                let from_scale = nlu.get_string_custom(from_value, "unit");
                 let to_value = nlu.get_slot_value(&parsed_json, "temperature_name", "to");
-                println!("from: {:?}  to: {:?}", from_value, to_value);
+                let to_scale = nlu.get_string(to_value);
+                let result = match from_scale.as_str() {
+                    "celsius" => {
+                        match to_scale.as_str() {
+                            "fahrenheit" => {
+                                eprintln!("{} * 1.8 + 32", from_degrees);
+                                from_degrees * 1.8 + 32.0
+                            },
+                            "kelvin" => {
+                                from_degrees + 273.15
+                            }
+                            _ => {
+                                eprintln!("{} to {} fell through", from_scale, to_scale);
+                                0.0
+                            }
+                        }
+                    },
+                    "fahrenheit" => {
+                        match to_scale.as_str() {
+                            "celsius" => {
+                                (from_degrees - 32.0) / 1.8
+                            },
+                            "kelvin" => {
+                                (from_degrees - 32.0) / 1.8 + 273.15
+                            }
+                            _ => {
+                                eprintln!("{} to {} fell through", from_scale, to_scale);
+                                0.0
+                            }
+                        }
+                    },
+                    "kelvin" => {
+                        match to_scale.as_str() {
+                            "celsius" => {
+                                from_degrees - 273.15
+                            },
+                            "fahrenheit" => {
+                                (from_degrees - 273.15) * 1.8 + 32.0
+                            }
+                            _ => {
+                                eprintln!("{} to {} fell through", from_scale, to_scale);
+                                0.0
+                            }
+                        }
+                    },
+                    _ => {
+                        eprintln!("{} to {} fell through", from_scale, to_scale);
+                        0.0
+                    }
+                };
                 KakaiaResponse::new(
                     &kakaia_command.string,
-                    format!("convert from {} to {}", "todo", "todo").as_str(),
+                    format!("{} degrees {} is {} degrees {}", from_degrees, from_scale, result, to_scale).as_str(),
                     &converted.raw,
-                    0
+                    result as i64
                 )
             } else {
                 KakaiaResponse::new(

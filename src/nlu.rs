@@ -90,6 +90,18 @@ impl NLU {
         }
     }
 
+    pub fn get_string_custom(&self, value: Option<&Map<String, Value>>, custom: &str) -> String {
+        match value {
+            Some(v) => {
+                match v[custom].as_str() {
+                    Some(n) => n.to_string(),
+                    None => "".to_string(),
+                }
+            },
+            None => "".to_string(),
+        }
+    }
+
     pub fn duration_as_seconds(&self, timer_values: &Map<String, Value>) -> i64 {
         let seconds: i64;
         if timer_values["seconds"].is_i64() {

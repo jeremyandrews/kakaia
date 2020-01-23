@@ -34,8 +34,8 @@
           "snips/number"
         ],
         "custom": [
-          "match_operation",
-          "operation"
+          "operation",
+          "match_operation"
         ]
       },
       "intent_group": [

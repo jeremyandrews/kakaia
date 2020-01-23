@@ -48,9 +48,9 @@ type: entity
 name: temperature_name
 automatically_extensible: no
 values:
-  - [celsius, degrees celcius, C, degrees C]
-  - [fahrenheit, degrees fahrenheit, F, degrees F]
-  - [kelvin, degrees kelvin, K, degree K]
+  - [celsius, degrees celsius, C, degrees C, selsus]
+  - [fahrenheit, degrees fahrenheit, F, degrees F, farnie]
+  - [kelvin, degrees kelvin, K, degree K, calvin]
 
 # simpleCalculation intent
 ---

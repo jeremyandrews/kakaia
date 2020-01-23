@@ -49,9 +49,10 @@
       "data": [
         {
           "synonyms": [
-            "degrees celcius",
+            "degrees celsius",
             "C",
-            "degrees C"
+            "degrees C",
+            "selsus"
           ],
           "value": "celsius"
         },
@@ -59,7 +60,8 @@
           "synonyms": [
             "degrees fahrenheit",
             "F",
-            "degrees F"
+            "degrees F",
+            "farnie"
           ],
           "value": "fahrenheit"
         },
@@ -67,7 +69,8 @@
           "synonyms": [
             "degrees kelvin",
             "K",
-            "degree K"
+            "degree K",
+            "calvin"
           ],
           "value": "kelvin"
         }
