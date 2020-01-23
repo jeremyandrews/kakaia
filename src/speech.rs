@@ -33,7 +33,7 @@ pub struct KakaiaResponse {
     command: String,
     human: String,
     raw: String,
-    result: i64,
+    result: f64,
 }
 
 #[derive(Debug)]
@@ -75,7 +75,7 @@ impl KakaiaCommand {
 }
 
 impl KakaiaResponse {
-    pub fn new(command: &str, human: &str, raw: &str, result: i64) -> Self {
+    pub fn new(command: &str, human: &str, raw: &str, result: f64) -> Self {
         KakaiaResponse {
             command: command.to_string(),
             human: human.to_string(),
@@ -226,7 +226,7 @@ pub async fn _audio_to_text(
             // @TODO: logging, properly handle this error
             let error = format!("failed to decode audio.data: {}\n", e);
             eprint!("{}", &error);
-            let kakaia_response = KakaiaResponse::new("none", "unexpected error decoding audio data", &error, 0);
+            let kakaia_response = KakaiaResponse::new("none", "unexpected error decoding audio data", &error, 0.0);
             return HttpResponse::InternalServerError()
                 .content_type("application/json")
                 .body(kakaia_response.to_json_string());
@@ -238,7 +238,7 @@ pub async fn _audio_to_text(
         Ok(f) => f,
         Err(e) => {
             let error = format!("failed to create temporary file: {}", e);
-            let kakaia_response = KakaiaResponse::new("none", "unexpected error creating a temporary file", &error, 0);
+            let kakaia_response = KakaiaResponse::new("none", "unexpected error creating a temporary file", &error, 0.0);
             return HttpResponse::InternalServerError()
                 .content_type("application/json")
                 .body(kakaia_response.to_json_string());
@@ -250,7 +250,7 @@ pub async fn _audio_to_text(
         Ok(a) => a,
         Err(e) => {
             let error = format!("failed to open temporary file: {}", e);
-            let kakaia_response = KakaiaResponse::new("none", "unexpected error opening a temporary file", &error, 0);
+            let kakaia_response = KakaiaResponse::new("none", "unexpected error opening a temporary file", &error, 0.0);
             return HttpResponse::InternalServerError()
                 .content_type("application/json")
                 .body(kakaia_response.to_json_string());
@@ -264,7 +264,7 @@ pub async fn _audio_to_text(
             Ok(b) => b,
             Err(e) => {
                 let error = format!("failed to create temporary file: {}", e);
-                let kakaia_response = KakaiaResponse::new("none", "unexpected error creating a temporary file", &error, 0);
+                let kakaia_response = KakaiaResponse::new("none", "unexpected error creating a temporary file", &error, 0.0);
                 return HttpResponse::InternalServerError()
                     .content_type("application/json")
                     .body(kakaia_response.to_json_string());
@@ -298,7 +298,7 @@ pub async fn _audio_to_text(
                     Err(e) => {
                         // @TODO: deal with this gracefully
                         let error = format!("failed to create archive copy of audio file: {}", e);
-                        let kakaia_response = KakaiaResponse::new("none", "unexpected error archiving a copy of audio file", &error, 0);
+                        let kakaia_response = KakaiaResponse::new("none", "unexpected error archiving a copy of audio file", &error, 0.0);
                         return HttpResponse::InternalServerError()
                             .content_type("application/json")
                             .body(kakaia_response.to_json_string());
@@ -311,7 +311,7 @@ pub async fn _audio_to_text(
                         Ok(b) => b,
                         Err(e) => {
                             let error = format!("failed to write archive file: {}", e);
-                            let kakaia_response = KakaiaResponse::new("none", "unexpected error writing a copy of audio file", &error, 0);
+                            let kakaia_response = KakaiaResponse::new("none", "unexpected error writing a copy of audio file", &error, 0.0);
                             return HttpResponse::InternalServerError()
                                 .content_type("application/json")
                                 .body(kakaia_response.to_json_string());
@@ -327,7 +327,7 @@ pub async fn _audio_to_text(
                     Err(e) => {
                         // @TODO: deal with this gracefully
                         let error = format!("failed to create archive text conversion of audio file: {}", e);
-                        let kakaia_response = KakaiaResponse::new("none", "unexpected error writing text conversion of audio file", &error, 0);
+                        let kakaia_response = KakaiaResponse::new("none", "unexpected error writing text conversion of audio file", &error, 0.0);
                         return HttpResponse::InternalServerError()
                             .content_type("application/json")
                             .body(kakaia_response.to_json_string());
@@ -340,7 +340,7 @@ pub async fn _audio_to_text(
             }
             Err(e) => {
                 let error = format!("failed to create directory '{}': {}", &archive_directory, e);
-                let kakaia_response = KakaiaResponse::new("none", "unexpected error creating directory", &error, 0);
+                let kakaia_response = KakaiaResponse::new("none", "unexpected error creating directory", &error, 0.0);
                 return HttpResponse::InternalServerError()
                     .content_type("application/json")
                     .body(kakaia_response.to_json_string());
@@ -361,7 +361,7 @@ pub async fn _audio_to_text(
                 &kakaia_command.string,
                 "no command",
                 &converted.raw,
-                0
+                0.0
             )
         }
         // setTimer command, return how many seconds the timer should run
@@ -380,14 +380,14 @@ pub async fn _audio_to_text(
                     &kakaia_command.string,
                     "not understood",
                     &converted.raw,
-                    0
+                    0.0
                 )
 
             }
         }
         // convertTemperature command, return converted temperature
         KakaiaCommandType::ConvertTemperature => {
-            //println!("ConvertTemperature: {:?}", parsed_json);
+            println!("ConvertTemperature: {:?}", parsed_json);
             if nlu.has_expected_slots(&parsed_json, 2) {
                 let from_value = nlu.get_slot_value(&parsed_json, "snips/temperature", "from");
                 let from_degrees = nlu.get_float(from_value);
@@ -447,14 +447,14 @@ pub async fn _audio_to_text(
                     &kakaia_command.string,
                     format!("{} degrees {} is {} degrees {}", from_degrees, from_scale, result, to_scale).as_str(),
                     &converted.raw,
-                    result as i64
+                    result
                 )
             } else {
                 KakaiaResponse::new(
                     &kakaia_command.string,
                     "not understood",
                     &converted.raw,
-                    0
+                    0.0
                 )
             }
         }
@@ -495,14 +495,14 @@ pub async fn _audio_to_text(
                     &kakaia_command.string,
                     format!("{} {} {} equals {}", first, operation_string, second, result).as_str(),
                     &converted.raw,
-                    result as i64
+                    result
                 )
             } else {
                 KakaiaResponse::new(
                     &kakaia_command.string,
                     "not understood",
                     &converted.raw,
-                    0
+                    0.0
                 )
             }
         }

@@ -102,7 +102,7 @@ impl NLU {
         }
     }
 
-    pub fn duration_as_seconds(&self, timer_values: &Map<String, Value>) -> i64 {
+    pub fn duration_as_seconds(&self, timer_values: &Map<String, Value>) -> f64 {
         let seconds: i64;
         if timer_values["seconds"].is_i64() {
             seconds = match serde_json::from_value(timer_values["seconds"].clone()) {
@@ -173,11 +173,11 @@ impl NLU {
             years = 0;
         }
 
-        seconds + minutes * 60 +
+        (seconds + minutes * 60 +
             hours * 60 * 60 +
             days * 86400 +
             weeks * 86400 * 7 +
             months * 86400 * 30 +
-            years * 86400 * 365
+            years * 86400 * 365) as f64
     }
 }

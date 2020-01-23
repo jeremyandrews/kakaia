@@ -40,7 +40,7 @@ utterances:
   - Please convert [from:snips/temperature](thirty two degrees fahrenheit) to [to:temperature_name](celcius)
   - Convert from [from:snips/temperature](one hundred degrees celcius) to [to:temperature_name](degrees kelvin)
   - Can you convert from [from:snips/temperature](ninety eight degrees fahrenheit) to [to:temperature_name](degrees C)
-  - Convert [from:snips/temperature](two hundred degress kelvin) to [to:temperature_name](fahrenheit) please
+  - Convert [from:snips/temperature](two hundred degrees kelvin) to [to:temperature_name](fahrenheit) please
 
 # temperature_name entity
 ---
@@ -48,9 +48,9 @@ type: entity
 name: temperature_name
 automatically_extensible: no
 values:
-  - [celsius, degrees celsius, C, degrees C, selsus]
-  - [fahrenheit, degrees fahrenheit, F, degrees F, farnie]
-  - [kelvin, degrees kelvin, K, degree K, calvin]
+  - [celsius, degrees celsius, C, degrees C, selsus, salius]
+  - [fahrenheit, degrees fahrenheit, F, degrees F, farnie, ferent]
+  - [kelvin, degrees kelvin, K, degrees K, calvin]
 
 # simpleCalculation intent
 ---

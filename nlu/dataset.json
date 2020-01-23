@@ -52,7 +52,8 @@
             "degrees celsius",
             "C",
             "degrees C",
-            "selsus"
+            "selsus",
+            "salius"
           ],
           "value": "celsius"
         },
@@ -61,7 +62,8 @@
             "degrees fahrenheit",
             "F",
             "degrees F",
-            "farnie"
+            "farnie",
+            "ferent"
           ],
           "value": "fahrenheit"
         },
@@ -69,7 +71,7 @@
           "synonyms": [
             "degrees kelvin",
             "K",
-            "degree K",
+            "degrees K",
             "calvin"
           ],
           "value": "kelvin"
@@ -170,7 +172,7 @@
             {
               "entity": "snips/temperature",
               "slot_name": "from",
-              "text": "two hundred degress kelvin"
+              "text": "two hundred degrees kelvin"
             },
             {
               "text": " to "
