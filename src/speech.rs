@@ -409,7 +409,7 @@ pub async fn _audio_to_text(
         }
         // simpleCalculation command, return result of calculation
         KakaiaCommandType::SimpleCalculation => {
-            println!("SimpleCalculation: {:?}", parsed_json);
+            //println!("SimpleCalculation: {:?}", parsed_json);
             if nlu.has_expected_slots(&parsed_json, 3) {
                 let first_value = nlu.get_slot_value(&parsed_json, "snips/number", "first");
                 let first = nlu.get_float(first_value);
@@ -417,16 +417,32 @@ pub async fn _audio_to_text(
                 let second = nlu.get_float(second_value);
                 let operation_value = nlu.get_slot_value(&parsed_json, "operation", "operation");
                 let operation = nlu.get_string(operation_value);
+                let operation_string;
                 let result = match operation.as_str() {
-                    "plus" => first + second,
-                    "minus" => first - second,
-                    "multiply" => first * second,
-                    "divide" => first / second,
-                    _ => 0.0,
+                    "plus" => { 
+                        operation_string = operation.to_string();
+                        first + second
+                    }
+                    "minus" => {
+                        operation_string = operation.to_string();
+                        first - second
+                    }
+                    "multiply" => {
+                        operation_string = "times".to_string();
+                        first * second
+                    }
+                    "divide" => {
+                        operation_string = "divided by".to_string();
+                        first / second
+                    }
+                    _ => {
+                        operation_string = "???".to_string();
+                        0.0
+                    }
                 };
                 KakaiaResponse::new(
                     &kakaia_command.string,
-                    format!("simple calculation of {} {} {} = {}", first, operation, second, result).as_str(),
+                    format!("{} {} {} equals {}", first, operation_string, second, result).as_str(),
                     &converted.raw,
                     result as i64
                 )
