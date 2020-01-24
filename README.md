@@ -74,6 +74,8 @@ Currently there is only one Kakaia client, it runs on Apple's watchOS:
 
 The client provides a simplistic interface to record audio on the watch, which is then base64 encoded and pushed to the Kakaia engine via an Actix API. The engine decodes the file and uses DeepSpeech to convert the audio to text, returning the text on success.
 
+[Other clients](https://github.com/jeremyandrews/kakaia/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3AClient+).
+
 ### Notes
 
 The Kakaia engine is written in Rust, using the [Rust bindings for the deepspeech library](https://github.com/RustAudio/deepspeech-rs) for speech-to-text conversions, and [Actix](https://actix.rs/) for the API.
