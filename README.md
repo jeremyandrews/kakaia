@@ -65,7 +65,7 @@ $ curl --data @test/ten-plus-ten.base64 http://127.0.0.1:8088/convert/audio/text
 $ curl --data @test/convert-temperature.base64 http://127.0.0.1:8088/convert/audio/text
 {"command":"convertTemperature","human":"5 degrees celsius is 41 degrees fahrenheit","raw":"convert five degrees celsius to farnie","result":41.0}
 ```
-Other [planned commands] (https://github.com/jeremyandrews/kakaia/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Acommand).
+Other [planned commands](https://github.com/jeremyandrews/kakaia/issues?utf8=%E2%9C%93&q=is%3Aissue+label%3Acommand).
 ### Kakaia client
 
 Currently there is only one Kakaia client, it runs on Apple's watchOS:
