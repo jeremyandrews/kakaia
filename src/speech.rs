@@ -146,26 +146,12 @@ impl KakaiaDeepSpeech {
 
         let desc = reader.description();
         // Validate the audio file.
-        let mut errors: Vec<String> = vec![];
         if desc.channel_count() != 1 {
             let error = format!(
                 "audio file must have exactly 1 track, not {}",
                 desc.channel_count()
             );
             eprintln!("{}", &error);
-            errors.push(error);
-        }
-        if desc.sample_rate() != SAMPLE_RATE {
-            let error = format!(
-                "audio sample rate must be {}, not {}",
-                SAMPLE_RATE,
-                desc.sample_rate()
-            );
-            eprintln!("{}", &error);
-            errors.push(error);
-        }
-        if errors.len() > 0 {
-            let error = format!("{:?}", errors);
             return AudioAsText {
                 raw: error,
                 filetype: "unknown".to_string(),
