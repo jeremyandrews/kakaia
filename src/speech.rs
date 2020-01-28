@@ -10,6 +10,7 @@ use audrey::sample::signal::{from_iter, Signal};
 use chrono::{DateTime, Utc};
 use deepspeech::Model;
 use tempfile::NamedTempFile;
+use rnnoise_c::{DenoiseState, FRAME_SIZE};
 use serde::Serialize;
 
 use crate::nlu::NLU;
@@ -19,8 +20,11 @@ use crate::Configuration;
 const BEAM_WIDTH: u16 = 500;
 const LM_WEIGHT: f32 = 0.75;
 const VALID_WORD_COUNT_WEIGHT: f32 = 1.85;
-// The provided model was trained on this specific sample rate.
-const SAMPLE_RATE: u32 = 16_000;
+// The DeepSpeech model has been trained on 16 KHz
+const DEEPSPEECH_SAMPLE_RATE :u32 = 16_000;
+
+// RNNoise assumes audio is 16-bit mono with a 48 KHz sample rate
+const RNNOISE_SAMPLE_RATE :u32 = 48_000;
 
 #[derive(Debug)]
 pub struct AudioAsText {
@@ -131,6 +135,73 @@ impl KakaiaDeepSpeech {
         }
     }
 
+    pub fn denoise_audio(&mut self, base_filename: &str, audio_file: std::fs::File) -> bool {
+        let mut reader = match Reader::new(&audio_file) {
+            Ok(r) => r,
+            Err(e) => {
+                eprintln!("failed to load audio file: {}", e);
+                return false;
+            }
+        };
+        let desc = reader.description();
+        assert_eq!(1, desc.channel_count(),
+            "The channel count is required to be one, at least for now");
+
+        // Obtain the buffer of samples
+        let mut audio_buf :Vec<_> = if desc.sample_rate() == RNNOISE_SAMPLE_RATE {
+            reader.samples::<f32>().map(|s| s.unwrap()).collect()
+        } else {
+            // We need to interpolate to the target sample rate
+            let interpolator = Linear::new([0f32], [0.0]);
+            let conv = Converter::from_hz_to_hz(
+                from_iter(reader.samples::<f32>().map(|s| [s.unwrap()])),
+                interpolator,
+                desc.sample_rate() as f64,
+                RNNOISE_SAMPLE_RATE as f64);
+            conv.until_exhausted().map(|v| v[0]).collect()
+        };
+
+        // The library requires each frame be exactly FRAME_SIZE, so we append
+        // some zeros to be sure the final frame is sufficiently long.
+        let padding = audio_buf.len() % FRAME_SIZE;
+        if padding > 0 {
+            let mut pad: Vec<f32> = vec![0.0; FRAME_SIZE - padding];
+            audio_buf.append(&mut pad);
+        }
+        let mut denoised_buffer: Vec<f32> = vec![];
+        let mut rnnoise = DenoiseState::new();
+        let mut denoised_chunk: Vec<f32> = vec![0.0; FRAME_SIZE];
+        let buffers = audio_buf[..].chunks(FRAME_SIZE);
+        for buffer in buffers {
+            rnnoise.process_frame_mut(&buffer, &mut denoised_chunk[..]);
+            denoised_buffer.extend_from_slice(&mut denoised_chunk);
+        }
+
+            // Write denoised buffer into output file
+        let spec = hound::WavSpec {
+            channels: 1,
+            sample_rate: RNNOISE_SAMPLE_RATE,
+            bits_per_sample: 32,
+            sample_format: hound::SampleFormat::Float,
+        };
+        let opt_wav_writer = hound::WavWriter::create(format!("{}.wav", base_filename), spec);
+        let mut wav_writer = match opt_wav_writer {
+            Ok(w) => w,
+            Err(e) => {
+                eprintln!("failed to create denoised wav file: {}", e);
+                return false;
+            }
+        };
+        denoised_buffer.iter().for_each(|i| wav_writer.write_sample(*i).expect("failed to write to wav file"));
+        match wav_writer.finalize() {
+            Ok(_) => true,
+            Err(e) => {
+                eprintln!("failed to write denoised wav file: {}", e);
+                false
+            }
+        }
+    }
+
     pub fn convert_audio_to_text(&mut self, audio_file: std::fs::File) -> AudioAsText {
         // Read audio from temporary file.
         let mut reader = match Reader::new(&audio_file) {
@@ -159,7 +230,7 @@ impl KakaiaDeepSpeech {
         }
 
         // Obtain the buffer of samples
-        let audio_buffer: Vec<_> = if desc.sample_rate() == SAMPLE_RATE {
+        let audio_buffer: Vec<_> = if desc.sample_rate() == DEEPSPEECH_SAMPLE_RATE {
             reader.samples().map(|s| s.unwrap()).collect()
         } else {
             // We need to interpolate to the target sample rate
@@ -168,7 +239,7 @@ impl KakaiaDeepSpeech {
                 from_iter(reader.samples::<i16>().map(|s| [s.unwrap()])),
                 interpolator,
                 desc.sample_rate() as f64,
-                SAMPLE_RATE as f64,
+                DEEPSPEECH_SAMPLE_RATE as f64,
             );
             conv.until_exhausted().map(|v| v[0]).collect()
         };
@@ -259,78 +330,65 @@ pub async fn _audio_to_text(
         pos += bytes_written;
     }
 
-    // Convert audio file to text.
-    let converted: AudioAsText = kakaia_deepspeech.convert_audio_to_text(audio_file);
+    // Temporarily store denoised audio, will be later removed if storing isn't enabled
+    let now: DateTime<Utc> = Utc::now();
+    let archive_directory = format!(
+        "archive/{}/{}/{}/",
+        now.format("%Y"),
+        now.format("%m"),
+        now.format("%d")
+    );
+    let base_filename: String;
+    let converted: AudioAsText;
+    match std::fs::create_dir_all(&archive_directory) {
+        Ok(_) => {
+            let hour = now.format("%H");
+            let minute = now.format("%M");
+            let second = now.format("%S");
+            base_filename = format!("{}/audio-{}-{}-{}", archive_directory, &hour, &minute, &second);
+            if kakaia_deepspeech.denoise_audio(&base_filename, audio_file) {
+                let denoised_audio_file = std::fs::File::open(format!("{}.wav", &base_filename)).unwrap();
+                // Convert audio file to text.
+                converted = kakaia_deepspeech.convert_audio_to_text(denoised_audio_file);
 
-    // Optionally store a copy of the audio and text
-    if config.store {
-        let now: DateTime<Utc> = Utc::now();
-        let archive_directory = format!(
-            "archive/{}/{}/{}/",
-            now.format("%Y"),
-            now.format("%m"),
-            now.format("%d")
-        );
-        match std::fs::create_dir_all(&archive_directory) {
-            Ok(_) => {
-                let hour = now.format("%H");
-                let minute = now.format("%M");
-                let second = now.format("%S");
-                let mut buffer = match std::fs::File::create(format!(
-                    "{}/audio-{}-{}-{}.{}",
-                    archive_directory, &hour, &minute, &second, converted.filetype
-                )) {
-                    Ok(b) => b,
-                    Err(e) => {
-                        // @TODO: deal with this gracefully
-                        let error = format!("failed to create archive copy of audio file: {}", e);
-                        let kakaia_response = KakaiaResponse::new("none", "unexpected error archiving a copy of audio file", &error, 0.0);
-                        return HttpResponse::InternalServerError()
-                            .content_type("application/json")
-                            .body(kakaia_response.to_json_string());
-                    }
-                };
-                // Write audio.bytes into temporary file.
-                let mut pos = 0;
-                while pos < audio_bytes.len() {
-                    let bytes_written = match buffer.write(&audio_bytes[pos..]) {
+                // Optionally store a copy of the audio and text
+                if config.store {
+                    let mut buffer = match std::fs::File::create(format!("{}.txt", &base_filename)) {
                         Ok(b) => b,
                         Err(e) => {
-                            let error = format!("failed to write archive file: {}", e);
-                            let kakaia_response = KakaiaResponse::new("none", "unexpected error writing a copy of audio file", &error, 0.0);
+                            // @TODO: deal with this gracefully
+                            let error = format!("failed to create archive text conversion of audio file: {}", e);
+                            let kakaia_response = KakaiaResponse::new("none", "unexpected error writing text conversion of audio file", &error, 0.0);
                             return HttpResponse::InternalServerError()
                                 .content_type("application/json")
                                 .body(kakaia_response.to_json_string());
                         }
                     };
-                    pos += bytes_written;
-                }
-                let mut buffer = match std::fs::File::create(format!(
-                    "{}/audio-{}-{}-{}.txt",
-                    archive_directory, &hour, &minute, &second
-                )) {
-                    Ok(b) => b,
-                    Err(e) => {
-                        // @TODO: deal with this gracefully
-                        let error = format!("failed to create archive text conversion of audio file: {}", e);
-                        let kakaia_response = KakaiaResponse::new("none", "unexpected error writing text conversion of audio file", &error, 0.0);
-                        return HttpResponse::InternalServerError()
-                            .content_type("application/json")
-                            .body(kakaia_response.to_json_string());
+                    match writeln!(buffer, "{}", &converted.raw) {
+                        Ok(_) => (),
+                        Err(e) => eprintln!("failed to archive text conversion of audio file: {}", e),
                     }
-                };
-                match writeln!(buffer, "{}", &converted.raw) {
-                    Ok(_) => (),
-                    Err(e) => eprintln!("failed to archive text conversion of audio file: {}", e),
+                }
+                // Otherwise remove the copy of the audio
+                else {
+                    // @TODO stuff
+                    print!("todo");
                 }
             }
-            Err(e) => {
-                let error = format!("failed to create directory '{}': {}", &archive_directory, e);
-                let kakaia_response = KakaiaResponse::new("none", "unexpected error creating directory", &error, 0.0);
+            else {
+                let error = format!("failed to denoise audio");
+                let kakaia_response = KakaiaResponse::new("none", "unexpected error denoising audio", &error, 0.0);
                 return HttpResponse::InternalServerError()
                     .content_type("application/json")
                     .body(kakaia_response.to_json_string());
             }
+        },
+        Err(e) => {
+            let error = format!("failed to create directory '{}': {}", &archive_directory, e);
+            let kakaia_response = KakaiaResponse::new("none", "unexpected error creating directory", &error, 0.0);
+            return HttpResponse::InternalServerError()
+                .content_type("application/json")
+                .body(kakaia_response.to_json_string());
         }
     }
 
