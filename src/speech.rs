@@ -344,7 +344,7 @@ pub async fn _audio_to_text(
         // no command, we do nothing
         KakaiaCommandType::None => {
             KakaiaResponse::new(
-                &kakaia_command.string,
+                "none",
                 "no command",
                 &converted.raw,
                 0.0
@@ -363,7 +363,7 @@ pub async fn _audio_to_text(
                 )
             } else {
                 KakaiaResponse::new(
-                    &kakaia_command.string,
+                    "none",
                     "not understood",
                     &converted.raw,
                     0.0
@@ -437,7 +437,7 @@ pub async fn _audio_to_text(
                 )
             } else {
                 KakaiaResponse::new(
-                    &kakaia_command.string,
+                    "none",
                     "not understood",
                     &converted.raw,
                     0.0
@@ -485,7 +485,7 @@ pub async fn _audio_to_text(
                 )
             } else {
                 KakaiaResponse::new(
-                    &kakaia_command.string,
+                    "none",
                     "not understood",
                     &converted.raw,
                     0.0
